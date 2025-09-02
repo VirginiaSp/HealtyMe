@@ -1,0 +1,27 @@
+{
+  "healthyMeApp": {
+    "medicationCategory": {
+      "home": {
+        "title": "Medication Categories",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Medication Category",
+        "createOrEditLabel": "Create or edit a Medication Category",
+        "notFound": "No Medication Categories found"
+      },
+      "created": "A new Medication Category is created with identifier {{ param }}",
+      "updated": "A Medication Category is updated with identifier {{ param }}",
+      "deleted": "A Medication Category is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Medication Category {{ id }}?"
+      },
+      "detail": {
+        "title": "Medication Category"
+      },
+      "id": "ID",
+      "name": "Name",
+      "description": "Description",
+      "owner": "Owner",
+      "medications": "Medications"
+    }
+  }
+}

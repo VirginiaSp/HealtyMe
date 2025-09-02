@@ -1,0 +1,30 @@
+{
+  "healthyMeApp": {
+    "medicationPlan": {
+      "home": {
+        "title": "Medication Plans",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Medication Plan",
+        "createOrEditLabel": "Create or edit a Medication Plan",
+        "notFound": "No Medication Plans found"
+      },
+      "created": "A new Medication Plan is created with identifier {{ param }}",
+      "updated": "A Medication Plan is updated with identifier {{ param }}",
+      "deleted": "A Medication Plan is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Medication Plan {{ id }}?"
+      },
+      "detail": {
+        "title": "Medication Plan"
+      },
+      "id": "ID",
+      "planName": "Plan Name",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "medicationName": "Medication Name",
+      "colorHex": "Color Hex",
+      "doses": "Doses",
+      "owner": "Owner"
+    }
+  }
+}

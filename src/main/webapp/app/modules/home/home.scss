@@ -1,0 +1,18 @@
+/* ==========================================================================
+Main page styles
+========================================================================== */
+.hipster {
+  display: inline-block;
+  width: 100%;
+  height: 497px;
+  background: url('/content/images/jhipster_family_member_1.svg') no-repeat center top;
+  background-size: contain;
+}
+// Home dashboard tweaks
+.card:hover {
+  transform: translateY(-2px);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+}

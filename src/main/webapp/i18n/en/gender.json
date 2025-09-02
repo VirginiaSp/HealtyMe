@@ -1,0 +1,11 @@
+{
+  "healthyMeApp": {
+    "Gender": {
+      "null": "",
+      "MALE": "MALE",
+      "FEMALE": "FEMALE",
+      "OTHER": "OTHER",
+      "UNKNOWN": "UNKNOWN"
+    }
+  }
+}

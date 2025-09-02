@@ -1,0 +1,31 @@
+{
+  "healthyMeApp": {
+    "examinationRecord": {
+      "home": {
+        "title": "Examination Records",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Examination Record",
+        "createOrEditLabel": "Create or edit a Examination Record",
+        "notFound": "No Examination Records found"
+      },
+      "created": "A new Examination Record is created with identifier {{ param }}",
+      "updated": "A Examination Record is updated with identifier {{ param }}",
+      "deleted": "A Examination Record is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Examination Record {{ id }}?"
+      },
+      "detail": {
+        "title": "Examination Record"
+      },
+      "id": "ID",
+      "title": "Title",
+      "examDate": "Exam Date",
+      "file": "File",
+      "originalFilename": "Original Filename",
+      "storedFilename": "Stored Filename",
+      "notes": "Notes",
+      "owner": "Owner",
+      "category": "Category"
+    }
+  }
+}

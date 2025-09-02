@@ -1,0 +1,27 @@
+{
+  "healthyMeApp": {
+    "medicationPlanDose": {
+      "home": {
+        "title": "Medication Plan Doses",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Medication Plan Dose",
+        "createOrEditLabel": "Create or edit a Medication Plan Dose",
+        "notFound": "No Medication Plan Doses found"
+      },
+      "created": "A new Medication Plan Dose is created with identifier {{ param }}",
+      "updated": "A Medication Plan Dose is updated with identifier {{ param }}",
+      "deleted": "A Medication Plan Dose is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Medication Plan Dose {{ id }}?"
+      },
+      "detail": {
+        "title": "Medication Plan Dose"
+      },
+      "id": "ID",
+      "timeOfDay": "Time Of Day",
+      "notes": "Notes",
+      "owner": "Owner",
+      "plan": "Plan"
+    }
+  }
+}

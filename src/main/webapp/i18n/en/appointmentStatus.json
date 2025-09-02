@@ -1,0 +1,10 @@
+{
+  "healthyMeApp": {
+    "AppointmentStatus": {
+      "null": "",
+      "PENDING": "PENDING",
+      "CONFIRMED": "CONFIRMED",
+      "CANCELLED": "CANCELLED"
+    }
+  }
+}
