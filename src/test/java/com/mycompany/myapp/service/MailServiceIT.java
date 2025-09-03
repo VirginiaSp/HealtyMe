@@ -26,10 +26,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+// ΔΙΟΡΘΩΜΕΝΟ import:
+import org.springframework.boot.test.mock.mockito.MockitoBean;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import tech.jhipster.config.JHipsterProperties;
+import tech.jhipster.config.JHipster;
 
 /**
  * Integration tests for {@link MailService}.
