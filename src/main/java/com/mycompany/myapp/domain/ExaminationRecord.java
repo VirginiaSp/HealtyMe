@@ -1,3 +1,5 @@
+package com.mycompany.myapp.domain;
+
 // imports
 import jakarta.persistence.*;
 import java.io.Serializable;

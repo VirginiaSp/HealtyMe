@@ -1,13 +1,14 @@
+package com.mycompany.myapp.service.mapper;
+
+import com.mycompany.myapp.domain.ExaminationRecord;
+import com.mycompany.myapp.service.dto.ExaminationRecordDTO;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
 public interface ExaminationRecordMapper extends EntityMapper<ExaminationRecordDTO, ExaminationRecord> {
-    @Override
-    @Mapping(target = "examDate", source = "examDate")
-    ExaminationRecord toEntity(ExaminationRecordDTO dto);
-
-    @Override
-    @Mapping(target = "examDate", source = "examDate")
-    ExaminationRecordDTO toDto(ExaminationRecord entity);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void partialUpdate(@MappingTarget ExaminationRecord entity, ExaminationRecordDTO dto);
 }
