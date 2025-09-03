@@ -33,6 +33,7 @@
     <include file="config/liquibase/changelog/20250829111323_added_entity_constraints_MedicationPlanDose.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250829111324_added_entity_constraints_ExaminationCategory.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250829111325_added_entity_constraints_ExaminationRecord.xml" relativeToChangelogFile="false"/>
-  <include file="config/liquibase/changelog/20250902-rename-exam-date.yml" relativeToChangelogFile="false"/>
+  <include file="config/liquibase/changelog/20250903_seed_admin_user.xml" relativeToChangelogFile="false"/>
+
 
 </databaseChangeLog>

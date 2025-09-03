@@ -57,27 +57,19 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
 
     private void setLocationForStaticAssets(WebServerFactory server) {
         if (server instanceof ConfigurableServletWebServerFactory servletWebServer) {
-            File root;
-            String prefixPath = resolvePathPrefix();
-            root = Path.of(prefixPath + "target/classes/static/").toFile();
-            if (root.exists() && root.isDirectory()) {
-                servletWebServer.setDocumentRoot(root);
+            try {
+                // getResource("static") βρίσκει τον φάκελο static στο classpath (universal για Spring Boot)
+                var resourceUrl = getClass().getClassLoader().getResource("static");
+                if (resourceUrl != null) {
+                    File root = new File(resourceUrl.toURI());
+                    if (root.exists() && root.isDirectory()) {
+                        servletWebServer.setDocumentRoot(root);
+                    }
+                }
+            } catch (Exception e) {
+                LOG.warn("Could not set document root for static assets", e);
             }
         }
-    }
-
-    /**
-     * Resolve path prefix to static resources.
-     */
-    private String resolvePathPrefix() {
-        String fullExecutablePath = decode(this.getClass().getResource("").getPath(), StandardCharsets.UTF_8);
-        String rootPath = Path.of(".").toUri().normalize().getPath();
-        String extractedPath = fullExecutablePath.replace(rootPath, "");
-        int extractionEndIndex = extractedPath.indexOf("target/");
-        if (extractionEndIndex <= 0) {
-            return "";
-        }
-        return extractedPath.substring(0, extractionEndIndex);
     }
 
     @Bean

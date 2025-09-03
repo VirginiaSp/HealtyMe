@@ -55,10 +55,14 @@ class WebConfigurerTest {
         assertThat(container.getMimeMappings().get("html")).isEqualTo("text/html");
         assertThat(container.getMimeMappings().get("json")).isEqualTo("application/json");
         if (container.getDocumentRoot() != null) {
-            assertThat(container.getDocumentRoot()).isEqualTo(Path.of("target/classes/static/").toFile());
+            // ΔΙΟΡΘΩΣΗ: σύγκριση των absolute paths!
+            assertThat(container.getDocumentRoot().getAbsolutePath()).isEqualTo(
+                Path.of("target/classes/static/").toFile().getAbsolutePath()
+            );
         }
     }
 
+    // Τα υπόλοιπα tests μένουν ίδια
     @Test
     void shouldCorsFilterOnApiPath() throws Exception {
         props.getCors().setAllowedOrigins(Collections.singletonList("other.domain.com"));

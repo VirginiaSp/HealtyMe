@@ -27,10 +27,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 // ΔΙΟΡΘΩΜΕΝΟ import:
-import org.springframework.boot.test.mock.mockito.MockitoBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.javamail.JavaMailSender;
-import tech.jhipster.config.JHipster;
+import tech.jhipster.config.JHipsterProperties;
 
 /**
  * Integration tests for {@link MailService}.
@@ -48,7 +48,7 @@ class MailServiceIT {
     @Autowired
     private JHipsterProperties jHipsterProperties;
 
-    @MockitoBean
+    @MockBean
     private JavaMailSender javaMailSender;
 
     @Captor

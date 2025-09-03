@@ -1,19 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>com.mycompany.myapp</groupId>
   <artifactId>healthy-me</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>healthy-me</name>
   <packaging>jar</packaging>
-
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.3.1</version>
     <relativePath/>
   </parent>
-
   <properties>
     <java.version>17</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,7 +20,6 @@
     <mapstruct.version>1.5.5.Final</mapstruct.version>
     <springdoc.version>2.6.0</springdoc.version>
   </properties>
-
   <dependencies>
     <!-- ArchUnit -->
     <dependency>
@@ -30,7 +28,23 @@
       <version>1.0.1</version>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.13.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-core</artifactId>
+      <version>2.3.6.Final</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-servlet</artifactId>
+      <version>2.3.6.Final</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Testcontainers -->
     <dependency>
       <groupId>org.testcontainers</groupId>
@@ -44,7 +58,6 @@
       <version>1.19.7</version>
       <scope>test</scope>
     </dependency>
-
     <!-- Spring Security Test -->
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -52,7 +65,6 @@
       <version>5.8.7</version>
       <scope>test</scope>
     </dependency>
-
     <!-- Mockito Bean Override (Spring Boot 3+) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -65,7 +77,6 @@
       <version>5.2.0</version>
       <scope>test</scope>
     </dependency>
-
     <!-- Spring Boot starters -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -83,7 +94,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
-
     <!-- Security / OAuth2 -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -97,7 +107,11 @@
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-oauth2-jose</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Actuator / Micrometer -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -107,7 +121,6 @@
       <groupId>io.micrometer</groupId>
       <artifactId>micrometer-core</artifactId>
     </dependency>
-
     <!-- Hibernate / Cache -->
     <dependency>
       <groupId>org.hibernate.orm</groupId>
@@ -127,20 +140,17 @@
       <artifactId>cache-api</artifactId>
       <version>1.1.1</version>
     </dependency>
-
     <!-- Jackson Hibernate6 -->
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
       <artifactId>jackson-datatype-hibernate6</artifactId>
     </dependency>
-
     <!-- OpenAPI -->
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
       <version>${springdoc.version}</version>
     </dependency>
-
     <!-- MapStruct -->
     <dependency>
       <groupId>org.mapstruct</groupId>
@@ -153,7 +163,6 @@
       <version>${mapstruct.version}</version>
       <scope>provided</scope>
     </dependency>
-
     <!-- JPA Metamodel generator (για τα *_ static metamodel classes) -->
     <dependency>
       <groupId>org.hibernate.orm</groupId>
@@ -161,20 +170,17 @@
       <version>6.4.4.Final</version>
       <scope>provided</scope>
     </dependency>
-
     <!-- JHipster helpers (όσα ήδη χρησιμοποιεί ο κώδικας) -->
     <dependency>
       <groupId>tech.jhipster</groupId>
       <artifactId>jhipster-framework</artifactId>
       <version>8.4.0</version>
     </dependency>
-
-    <!-- Liquibase (για SpringLiquibase) -->
+    <!-- Liquibase για Spring Boot -->
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
     </dependency>
-
     <!-- Mail + Thymeleaf -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -184,25 +190,21 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
-
     <dependency>
       <groupId>jakarta.annotation</groupId>
       <artifactId>jakarta.annotation-api</artifactId>
       <version>2.1.1</version>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -211,16 +213,16 @@
         <version>9.0.0</version>
         <executions>
           <execution>
-            <goals><goal>revision</goal></goals>
+            <goals>
+              <goal>revision</goal>
+            </goals>
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -243,7 +245,6 @@
           </annotationProcessorPaths>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
@@ -251,7 +252,9 @@
         <executions>
           <execution>
             <id>install-node-and-npm</id>
-            <goals><goal>install-node-and-npm</goal></goals>
+            <goals>
+              <goal>install-node-and-npm</goal>
+            </goals>
             <configuration>
               <nodeVersion>v20.17.0</nodeVersion>
               <npmVersion>10.8.2</npmVersion>
@@ -259,14 +262,18 @@
           </execution>
           <execution>
             <id>npm-install</id>
-            <goals><goal>npm</goal></goals>
+            <goals>
+              <goal>npm</goal>
+            </goals>
             <configuration>
               <arguments>install</arguments>
             </configuration>
           </execution>
           <execution>
             <id>webapp-build-dev</id>
-            <goals><goal>npm</goal></goals>
+            <goals>
+              <goal>npm</goal>
+            </goals>
             <phase>generate-resources</phase>
             <configuration>
               <arguments>run webapp:build</arguments>
@@ -276,7 +283,6 @@
       </plugin>
     </plugins>
   </build>
-
   <repositories>
     <repository>
       <id>central</id>

@@ -7,6 +7,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.Test;
+import tech.jhipster.service.filter.LocalDateFilter;
+import tech.jhipster.service.filter.LongFilter;
+import tech.jhipster.service.filter.StringFilter;
 
 class ExaminationRecordCriteriaTest {
 
@@ -17,7 +20,7 @@ class ExaminationRecordCriteriaTest {
     }
 
     @Test
-    void examinationRecordCriteriaFluentMethodsCreatesFiltersTest() {
+    void examinationRecordCriteriaSettersCreateFiltersTest() {
         var examinationRecordCriteria = new ExaminationRecordCriteria();
 
         setAllFilters(examinationRecordCriteria);
@@ -33,7 +36,7 @@ class ExaminationRecordCriteriaTest {
         assertThat(examinationRecordCriteria).satisfies(
             criteria ->
                 assertThat(criteria).is(
-                    copyFiltersAre(copy, (a, b) -> (a == null || a instanceof Boolean) ? a == b : (a != b && a.equals(b)))
+                    copyFiltersAre(copy, (a, b) -> (a == null || a instanceof Boolean) ? a == b : (a != b && Objects.equals(a, b)))
                 ),
             criteria -> assertThat(criteria).isEqualTo(copy),
             criteria -> assertThat(criteria).hasSameHashCodeAs(copy)
@@ -55,7 +58,7 @@ class ExaminationRecordCriteriaTest {
         assertThat(examinationRecordCriteria).satisfies(
             criteria ->
                 assertThat(criteria).is(
-                    copyFiltersAre(copy, (a, b) -> (a == null || a instanceof Boolean) ? a == b : (a != b && a.equals(b)))
+                    copyFiltersAre(copy, (a, b) -> (a == null || a instanceof Boolean) ? a == b : (a != b && Objects.equals(a, b)))
                 ),
             criteria -> assertThat(criteria).isEqualTo(copy),
             criteria -> assertThat(criteria).hasSameHashCodeAs(copy)
@@ -75,15 +78,15 @@ class ExaminationRecordCriteriaTest {
     }
 
     private static void setAllFilters(ExaminationRecordCriteria examinationRecordCriteria) {
-        examinationRecordCriteria.id();
-        examinationRecordCriteria.title();
-        examinationRecordCriteria.examDate();
-        examinationRecordCriteria.originalFilename();
-        examinationRecordCriteria.storedFilename();
-        examinationRecordCriteria.notes();
-        examinationRecordCriteria.ownerId();
-        examinationRecordCriteria.categoryId();
-        examinationRecordCriteria.distinct();
+        examinationRecordCriteria.setId(new LongFilter());
+        examinationRecordCriteria.setTitle(new StringFilter());
+        examinationRecordCriteria.setExamDate(new LocalDateFilter());
+        examinationRecordCriteria.setOriginalFilename(new StringFilter());
+        examinationRecordCriteria.setStoredFilename(new StringFilter());
+        examinationRecordCriteria.setNotes(new StringFilter());
+        examinationRecordCriteria.setOwnerId(new LongFilter());
+        examinationRecordCriteria.setCategoryId(new LongFilter());
+        examinationRecordCriteria.setDistinct(Boolean.TRUE);
     }
 
     private static Condition<ExaminationRecordCriteria> criteriaFiltersAre(Function<Object, Boolean> condition) {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+  <changeSet id="seed-admin-user" author="VirginiaSp">
+    <sql>
+      MERGE INTO jhi_user
+      (id, login, password_hash, first_name, last_name, email, activated, lang_key, created_by, created_date)
+      VALUES (
+      1,
+      'admin',
+      '$2a$10$u4yKqFJwE/GB0b2zZl8KGuV3V8yVj1gS5rYQh8Hk0JQZ6v9yK6yQK',
+      'Admin',
+      'Administrator',
+      'admin@localhost',
+      TRUE,
+      'en',
+      'system',
+      '2025-09-03T19:44:34'
+      );
+    </sql>
+    <sql>
+      MERGE INTO jhi_user_authority (user_id, authority_name)
+      VALUES (1, 'ROLE_ADMIN');
+    </sql>
+  </changeSet>
+</databaseChangeLog>
