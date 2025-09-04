@@ -19,12 +19,17 @@ import tech.jhipster.config.JHipsterProperties;
 public class LoggingConfiguration {
 
     public LoggingConfiguration(
-        @Value("${spring.application.name}") String appName,
-        @Value("${server.port}") String serverPort,
+        @Value("${spring.application.name:HealthyMe}") String appName,
+        @Value("${server.port:8080}") String serverPort, // default port fallback
         JHipsterProperties jHipsterProperties,
         ObjectMapper mapper
     ) throws JsonProcessingException {
         LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+        // fallback if serverPort is empty
+        if (serverPort == null || serverPort.isEmpty()) {
+            serverPort = "8080";
+        }
 
         Map<String, String> map = new HashMap<>();
         map.put("app_name", appName);

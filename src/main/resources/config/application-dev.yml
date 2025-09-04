@@ -47,4 +47,8 @@ spring:
 logging:
   level:
     org.springframework.security: DEBUG
+    org.springframework.security.authentication: DEBUG
+    org.springframework.security.core: DEBUG
+    org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter: DEBUG
     org.springframework.web: DEBUG
+    tech.jhipster: DEBUG

@@ -15,6 +15,8 @@
 # ===================================================================
 
 ---
+server:
+  port: 8080
 # Conditionally disable springdoc on missing api-docs profile
 spring:
   config:
@@ -99,9 +101,6 @@ spring:
       lifecycle-management: start-only
       file: src/main/docker/services.yml
   profiles:
-    # The commented value for `active` can be replaced with valid Spring profiles to load.
-    # Otherwise, it will be filled in by maven when building the JAR file
-    # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
     active: '@spring.profiles.active@'
     group:
       dev:
@@ -126,7 +125,6 @@ spring:
       hibernate.cache.use_second_level_cache: true
       hibernate.cache.use_query_cache: false
       hibernate.generate_statistics: false
-      # modify batch size as necessary
       hibernate.jdbc.batch_size: 25
       hibernate.order_inserts: true
       hibernate.order_updates: true
@@ -166,6 +164,17 @@ spring:
   output:
     ansi:
       console-available: true
+  mail:
+    host: localhost
+    port: 1025
+    username: ''
+    password: ''
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
 
 server:
   servlet:
@@ -176,28 +185,16 @@ server:
 springdoc:
   show-actuator: true
 
-# Properties to be exposed on the /info management endpoint
 info:
-  # Comma separated list of profiles that will trigger the ribbon to show
   display-ribbon-on-profiles: 'dev'
 
 # ===================================================================
 # JHipster specific properties
-#
-# Full reference is available at: https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
 jhipster:
   clientApp:
     name: 'healthyMeApp'
-  # By default CORS is disabled. Uncomment to enable.
-  # cors:
-  #   allowed-origins: "http://localhost:8100,http://localhost:9000"
-  #   allowed-methods: "*"
-  #   allowed-headers: "*"
-  #   exposed-headers: "Authorization,Link,X-Total-Count,X-${jhipster.clientApp.name}-alert,X-${jhipster.clientApp.name}-error,X-${jhipster.clientApp.name}-params"
-  #   allow-credentials: true
-  #   max-age: 1800
   mail:
     from: HealthyMe@localhost
   api-docs:
@@ -214,16 +211,14 @@ jhipster:
     license-url:
   security:
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
+    authentication:
+      jwt:
+        base64-secret: 'cm9vdA=='
 
 # jhipster-needle-add-application-yaml-document
 ---
 # ===================================================================
 # Application specific properties
-# Add your own application properties here, see the ApplicationProperties class
-# to have type-safe configuration, like in the JHipsterProperties above
-#
-# More documentation is available at:
-# https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
 # application:

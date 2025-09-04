@@ -28,11 +28,18 @@ public class SecurityConfiguration {
             )
             .authorizeHttpRequests(auth ->
                 auth
-                    // Αυτή η γραμμή είναι ΚΡΙΣΙΜΗ:
                     .requestMatchers("/h2-console/**")
                     .permitAll()
                     .requestMatchers("/management/**", "/v3/api-docs/**", "/swagger-ui/**")
                     .permitAll()
+                    .requestMatchers("/register")
+                    .permitAll()
+                    .requestMatchers("/api/register")
+                    .permitAll() // Για REST API registration
+                    .requestMatchers("/api/authenticate")
+                    .permitAll() // Για REST API login
+                    .requestMatchers("/api/password-reset")
+                    .permitAll() // Για reset password (αν υπάρχει)
                     .anyRequest()
                     .authenticated()
             )
