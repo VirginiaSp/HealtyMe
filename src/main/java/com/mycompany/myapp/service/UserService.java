@@ -282,7 +282,19 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthoritiesByLogin(String login) {
-        return userRepository.findOneWithAuthoritiesByLogin(login);
+        Optional<User> userOpt = userRepository.findOneWithAuthoritiesByLogin(login);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            LOG.info(
+                "DEBUG: Fetching user with login '{}', activated status: {}, authorities: {}",
+                user.getLogin(),
+                user.isActivated(),
+                user.getAuthorities() == null ? "null" : user.getAuthorities().toString()
+            );
+        } else {
+            LOG.info("DEBUG: No user found with login '{}'", login);
+        }
+        return userOpt;
     }
 
     @Transactional(readOnly = true)

@@ -1,3 +1,4 @@
+testProperty: 'itworks'
 server:
   port: 8080
 
@@ -5,7 +6,9 @@ jhipster:
   security:
     authentication:
       jwt:
-        base64-secret: 'cm9vdA=='
+        base64-secret: 'NqLBLotT09k5ECyz1FMZQKgCJGO8WI+rtijTUSPjD+wFujLxx+V4qWAYtNrNXzQyiHKRFEV/8ieOdCjDEAol3g=='
+        token-validity-in-seconds: 86400
+        token-validity-in-seconds-for-remember-me: 2592000
 
 spring:
   devtools:
@@ -17,8 +20,9 @@ spring:
   jackson:
     serialization:
       indent-output: true
-  datasource:
-    url: jdbc:h2:mem:healthyme;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  datasource: # <-- ΕΔΩ ΧΩΡΙΣ ΚΑΝΕΝΑ SPACE, ΙΔΙΑ ΣΤΗΛΗ ΜΕ ΤΑ ΠΑΝΩ!
+    # file-based H2 DB (μακροπρόθεσμη αποθήκευση, δεν χάνεται με restart)
+    url: jdbc:h2:file:./target/h2db/db/healthyme;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password:
