@@ -17,6 +17,38 @@ public class ExaminationRecordDTO implements Serializable {
     private Long ownerId;
     private Long categoryId;
 
+    // ADD THIS: Category object as a simple nested class
+    private CategoryInfo category;
+
+    // Simple inner class to handle category JSON
+    public static class CategoryInfo implements Serializable {
+
+        private Long id;
+        private String name;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return "CategoryInfo{id=" + id + ", name='" + name + "'}";
+        }
+    }
+
+    // Existing getters/setters...
     public Long getId() {
         return id;
     }
@@ -97,6 +129,19 @@ public class ExaminationRecordDTO implements Serializable {
         this.categoryId = categoryId;
     }
 
+    // ADD THESE: Category object getters/setters
+    public CategoryInfo getCategory() {
+        return category;
+    }
+
+    public void setCategory(CategoryInfo category) {
+        this.category = category;
+        // Also set categoryId for backwards compatibility
+        if (category != null) {
+            this.categoryId = category.getId();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -139,6 +184,8 @@ public class ExaminationRecordDTO implements Serializable {
             ownerId +
             ", categoryId=" +
             categoryId +
+            ", category=" +
+            category +
             '}'
         );
     }
