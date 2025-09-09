@@ -19,6 +19,7 @@ export const ExaminationRecordDetail = () => {
   }, []);
 
   const examinationRecordEntity = useAppSelector(state => state.examinationRecord.entity);
+
   return (
     <Row>
       <Col md="8">
@@ -92,7 +93,12 @@ export const ExaminationRecordDetail = () => {
           <dt>
             <Translate contentKey="healthyMeApp.examinationRecord.category">Category</Translate>
           </dt>
-          <dd>{examinationRecordEntity.category ? examinationRecordEntity.category.id : ''}</dd>
+          <dd>
+            {/* FIXED: Show category name instead of just ID */}
+            {examinationRecordEntity.category
+              ? `${examinationRecordEntity.category.name} (ID: ${examinationRecordEntity.category.id})`
+              : 'No Category'}
+          </dd>
         </dl>
         <Button tag={Link} to="/examination-record" replace color="info" data-cy="entityDetailsBackButton">
           <FontAwesomeIcon icon="arrow-left" />{' '}

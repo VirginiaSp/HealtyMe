@@ -15,12 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.jhipster.service.QueryService;
 
-/**
- * Service for executing complex queries for {@link MedicationCategory} entities in the database.
- * The main input is a {@link MedicationCategoryCriteria} which gets converted to {@link Specification},
- * in a way that all the filters must apply.
- * It returns a {@link List} of {@link MedicationCategoryDTO} which fulfills the criteria.
- */
 @Service
 @Transactional(readOnly = true)
 public class MedicationCategoryQueryService extends QueryService<MedicationCategory> {
@@ -28,7 +22,6 @@ public class MedicationCategoryQueryService extends QueryService<MedicationCateg
     private static final Logger LOG = LoggerFactory.getLogger(MedicationCategoryQueryService.class);
 
     private final MedicationCategoryRepository medicationCategoryRepository;
-
     private final MedicationCategoryMapper medicationCategoryMapper;
 
     public MedicationCategoryQueryService(
@@ -39,11 +32,6 @@ public class MedicationCategoryQueryService extends QueryService<MedicationCateg
         this.medicationCategoryMapper = medicationCategoryMapper;
     }
 
-    /**
-     * Return a {@link List} of {@link MedicationCategoryDTO} which matches the criteria from the database.
-     * @param criteria The object which holds all the filters, which the entities should match.
-     * @return the matching entities.
-     */
     @Transactional(readOnly = true)
     public List<MedicationCategoryDTO> findByCriteria(MedicationCategoryCriteria criteria) {
         LOG.debug("find by criteria : {}", criteria);
@@ -51,11 +39,6 @@ public class MedicationCategoryQueryService extends QueryService<MedicationCateg
         return medicationCategoryMapper.toDto(medicationCategoryRepository.findAll(specification));
     }
 
-    /**
-     * Return the number of matching entities in the database.
-     * @param criteria The object which holds all the filters, which the entities should match.
-     * @return the number of matching entities.
-     */
     @Transactional(readOnly = true)
     public long countByCriteria(MedicationCategoryCriteria criteria) {
         LOG.debug("count by criteria : {}", criteria);
@@ -63,25 +46,34 @@ public class MedicationCategoryQueryService extends QueryService<MedicationCateg
         return medicationCategoryRepository.count(specification);
     }
 
-    /**
-     * Function to convert {@link MedicationCategoryCriteria} to a {@link Specification}
-     * @param criteria The object which holds all the filters, which the entities should match.
-     * @return the matching {@link Specification} of the entity.
-     */
+    // FIXED: Proper null handling instead of using Specification.allOf()
     protected Specification<MedicationCategory> createSpecification(MedicationCategoryCriteria criteria) {
         Specification<MedicationCategory> specification = Specification.where(null);
         if (criteria != null) {
-            // This has to be called first, because the distinct method returns null
-            specification = Specification.allOf(
-                Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
-                buildRangeSpecification(criteria.getId(), MedicationCategory_.id),
-                buildStringSpecification(criteria.getName(), MedicationCategory_.name),
-                buildStringSpecification(criteria.getDescription(), MedicationCategory_.description),
-                buildSpecification(criteria.getOwnerId(), root -> root.join(MedicationCategory_.owner, JoinType.LEFT).get(User_.id)),
-                buildSpecification(criteria.getMedicationsId(), root ->
-                    root.join(MedicationCategory_.medications, JoinType.LEFT).get(Medication_.id)
-                )
-            );
+            if (Boolean.TRUE.equals(criteria.getDistinct())) {
+                specification = specification.and(distinct(criteria.getDistinct()));
+            }
+            if (criteria.getId() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getId(), MedicationCategory_.id));
+            }
+            if (criteria.getName() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getName(), MedicationCategory_.name));
+            }
+            if (criteria.getDescription() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getDescription(), MedicationCategory_.description));
+            }
+            if (criteria.getOwnerId() != null) {
+                specification = specification.and(
+                    buildSpecification(criteria.getOwnerId(), root -> root.join(MedicationCategory_.owner, JoinType.LEFT).get(User_.id))
+                );
+            }
+            if (criteria.getMedicationsId() != null) {
+                specification = specification.and(
+                    buildSpecification(criteria.getMedicationsId(), root ->
+                        root.join(MedicationCategory_.medications, JoinType.LEFT).get(Medication_.id)
+                    )
+                );
+            }
         }
         return specification;
     }

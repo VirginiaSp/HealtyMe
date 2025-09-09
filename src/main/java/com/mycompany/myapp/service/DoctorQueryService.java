@@ -1,3 +1,4 @@
+// FIXED DoctorQueryService.java
 package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.*; // for static metamodels
@@ -29,7 +30,6 @@ public class DoctorQueryService extends QueryService<Doctor> {
     private static final Logger LOG = LoggerFactory.getLogger(DoctorQueryService.class);
 
     private final DoctorRepository doctorRepository;
-
     private final DoctorMapper doctorMapper;
 
     public DoctorQueryService(DoctorRepository doctorRepository, DoctorMapper doctorMapper) {
@@ -67,21 +67,39 @@ public class DoctorQueryService extends QueryService<Doctor> {
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching {@link Specification} of the entity.
      */
+    // FIXED: Replaced Specification.allOf() with proper null checks
     protected Specification<Doctor> createSpecification(DoctorCriteria criteria) {
         Specification<Doctor> specification = Specification.where(null);
         if (criteria != null) {
-            // This has to be called first, because the distinct method returns null
-            specification = Specification.allOf(
-                Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
-                buildRangeSpecification(criteria.getId(), Doctor_.id),
-                buildStringSpecification(criteria.getFirstName(), Doctor_.firstName),
-                buildStringSpecification(criteria.getLastName(), Doctor_.lastName),
-                buildStringSpecification(criteria.getSpecialty(), Doctor_.specialty),
-                buildStringSpecification(criteria.getPhone(), Doctor_.phone),
-                buildStringSpecification(criteria.getAddress(), Doctor_.address),
-                buildStringSpecification(criteria.getNotes(), Doctor_.notes),
-                buildSpecification(criteria.getOwnerId(), root -> root.join(Doctor_.owner, JoinType.LEFT).get(User_.id))
-            );
+            if (Boolean.TRUE.equals(criteria.getDistinct())) {
+                specification = specification.and(distinct(criteria.getDistinct()));
+            }
+            if (criteria.getId() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getId(), Doctor_.id));
+            }
+            if (criteria.getFirstName() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getFirstName(), Doctor_.firstName));
+            }
+            if (criteria.getLastName() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getLastName(), Doctor_.lastName));
+            }
+            if (criteria.getSpecialty() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getSpecialty(), Doctor_.specialty));
+            }
+            if (criteria.getPhone() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getPhone(), Doctor_.phone));
+            }
+            if (criteria.getAddress() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getAddress(), Doctor_.address));
+            }
+            if (criteria.getNotes() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getNotes(), Doctor_.notes));
+            }
+            if (criteria.getOwnerId() != null) {
+                specification = specification.and(
+                    buildSpecification(criteria.getOwnerId(), root -> root.join(Doctor_.owner, JoinType.LEFT).get(User_.id))
+                );
+            }
         }
         return specification;
     }

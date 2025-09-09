@@ -57,60 +57,86 @@ export const ExaminationRecordUpdate = () => {
     [categories],
   );
 
-  const [categoryName, setCategoryName] = useState<string>((examinationRecordEntity.category?.name ?? '').trim());
+  const [categoryName, setCategoryName] = useState<string>('');
   const [showCatList, setShowCatList] = useState(false);
+
+  // FIXED: Set category name when editing existing record
+  useEffect(() => {
+    if (!isNew && examinationRecordEntity?.category?.name) {
+      setCategoryName(examinationRecordEntity.category.name.trim());
+    }
+  }, [examinationRecordEntity, isNew]);
 
   const catSuggestions: string[] = useMemo(
     () => (categoryNames ?? []).filter(n => n.toLowerCase().includes((categoryName ?? '').toLowerCase())).slice(0, 8),
     [categoryNames, categoryName],
   );
 
-  // --- Save handler (ΜΟΝΟ ΕΝΑΣ!) ---
+  // FIXED: Save handler with proper error handling and debugging
   const saveEntity = async (values: IExaminationRecord) => {
-    // 1) resolve/create category από το typed name
-    const typed = (categoryName ?? '').trim();
-    let category: IExaminationCategory | undefined;
+    try {
+      // 1) resolve/create category from typed name
+      const typed = (categoryName ?? '').trim();
+      let category: IExaminationCategory | undefined;
 
-    if (typed) {
-      const existing = (categories ?? []).find(c => (c.name ?? '').trim().toLowerCase() === typed.toLowerCase());
-      if (existing) {
-        category = { id: existing.id, name: existing.name ?? typed };
-      } else {
-        // create-on-the-fly με owner
-        const action = await dispatch(
-          createCategory({
-            name: typed,
-            owner: account?.id ? ({ id: account.id } as any) : undefined,
-          } as IExaminationCategory),
-        );
-        const created = (action as any).payload as IExaminationCategory | undefined;
-        category = created?.id ? { id: created.id, name: created.name ?? typed } : { name: typed };
+      console.warn('Typed category name:', typed);
+      console.warn('Available categories:', categories);
+
+      if (typed) {
+        const existing = (categories ?? []).find(c => (c.name ?? '').trim().toLowerCase() === typed.toLowerCase());
+        if (existing) {
+          category = { id: existing.id, name: existing.name };
+          console.warn('Using existing category:', category);
+        } else {
+          // create new category
+          console.warn('Creating new category:', typed);
+          const action = await dispatch(
+            createCategory({
+              name: typed,
+              owner: account?.id ? ({ id: account.id } as any) : undefined,
+            } as IExaminationCategory),
+          );
+
+          // FIXED: Proper handling of created category
+          if (action.meta.requestStatus === 'fulfilled') {
+            const created = (action.payload as any)?.data;
+            category = created ? { id: created.id, name: created.name } : { name: typed };
+            console.warn('Created category result:', category);
+          } else {
+            console.error('Failed to create category:', action);
+            category = { name: typed };
+          }
+        }
       }
-    }
 
-    // 2) auto title (backend έχει @NotNull)
-    const computedTitle =
-      (values as any)?.title ??
-      examinationRecordEntity?.title ??
-      (category?.name
-        ? `${category.name}${values?.examDate ? ` - ${values.examDate}` : ''}`
-        : `Examination${values?.examDate ? ` - ${values.examDate}` : ''}`);
+      // 2) auto title (backend has @NotNull)
+      const computedTitle =
+        (values as any)?.title ??
+        examinationRecordEntity?.title ??
+        (category?.name
+          ? `${category.name}${values?.examDate ? ` - ${values.examDate}` : ''}`
+          : `Examination${values?.examDate ? ` - ${values.examDate}` : ''}`);
 
-    // 3) build entity
-    const entity: IExaminationRecord = {
-      ...examinationRecordEntity,
-      ...values,
-      title: computedTitle,
-      category,
-      // Αν απαιτείται owner και στο record, ξεκλείδωσε τη γραμμή:
-      // owner: account?.id ? ({ id: account.id } as any) : undefined,
-    };
+      // 3) build entity
+      const entity: IExaminationRecord = {
+        ...examinationRecordEntity,
+        ...values,
+        title: computedTitle,
+        category,
+      };
 
-    // 4) save
-    if (isNew) {
-      await dispatch(createRecord(entity));
-    } else {
-      await dispatch(updateRecord(entity));
+      // DEBUG: See what's being saved
+      console.warn('Saving entity:', entity);
+      console.warn('Category being saved:', category);
+
+      // 4) save
+      if (isNew) {
+        await dispatch(createRecord(entity));
+      } else {
+        await dispatch(updateRecord(entity));
+      }
+    } catch (error) {
+      console.error('Error saving examination record:', error);
     }
   };
 
@@ -162,7 +188,7 @@ export const ExaminationRecordUpdate = () => {
                 }}
                 onFocus={() => setShowCatList(true)}
                 onBlur={() => setTimeout(() => setShowCatList(false), 150)}
-                placeholder="Πληκτρολόγησε κατηγορία (π.χ. Αιματολογικές)"
+                placeholder="Type category (e.g. Blood Tests, Cardiology)"
               />
               {showCatList && (catSuggestions?.length ?? 0) > 0 && (
                 <div className="dropdown-menu show w-100 mt-1" style={{ maxHeight: 240, overflowY: 'auto' }} role="listbox">
@@ -183,6 +209,7 @@ export const ExaminationRecordUpdate = () => {
                 </div>
               )}
             </div>
+            <small className="form-text text-muted">Current category: {categoryName || 'None selected'}</small>
           </FormGroup>
 
           {/* FILE */}

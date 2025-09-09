@@ -28,7 +28,6 @@ public class ExaminationCategoryQueryService extends QueryService<ExaminationCat
     private static final Logger LOG = LoggerFactory.getLogger(ExaminationCategoryQueryService.class);
 
     private final ExaminationCategoryRepository examinationCategoryRepository;
-
     private final ExaminationCategoryMapper examinationCategoryMapper;
 
     public ExaminationCategoryQueryService(
@@ -68,17 +67,27 @@ public class ExaminationCategoryQueryService extends QueryService<ExaminationCat
      * @param criteria The object which holds all the filters, which the entities should match.
      * @return the matching {@link Specification} of the entity.
      */
+    // FIXED: Replaced Specification.allOf() with proper null checks
     protected Specification<ExaminationCategory> createSpecification(ExaminationCategoryCriteria criteria) {
         Specification<ExaminationCategory> specification = Specification.where(null);
         if (criteria != null) {
-            // This has to be called first, because the distinct method returns null
-            specification = Specification.allOf(
-                Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
-                buildRangeSpecification(criteria.getId(), ExaminationCategory_.id),
-                buildStringSpecification(criteria.getName(), ExaminationCategory_.name),
-                buildStringSpecification(criteria.getDescription(), ExaminationCategory_.description),
-                buildSpecification(criteria.getOwnerId(), root -> root.join(ExaminationCategory_.owner, JoinType.LEFT).get(User_.id))
-            );
+            if (Boolean.TRUE.equals(criteria.getDistinct())) {
+                specification = specification.and(distinct(criteria.getDistinct()));
+            }
+            if (criteria.getId() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getId(), ExaminationCategory_.id));
+            }
+            if (criteria.getName() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getName(), ExaminationCategory_.name));
+            }
+            if (criteria.getDescription() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getDescription(), ExaminationCategory_.description));
+            }
+            if (criteria.getOwnerId() != null) {
+                specification = specification.and(
+                    buildSpecification(criteria.getOwnerId(), root -> root.join(ExaminationCategory_.owner, JoinType.LEFT).get(User_.id))
+                );
+            }
         }
         return specification;
     }
