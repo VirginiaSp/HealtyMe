@@ -21,6 +21,11 @@
       "name": "Name",
       "rating": "Rating",
       "notes": "Notes",
+      "dosage": "Dosage",
+      "frequency": "Frequency",
+      "sideEffects": "Side Effects",
+      "createdDate": "Created Date",
+      "lastTaken": "Last Taken",
       "owner": "Owner",
       "categories": "Categories"
     }

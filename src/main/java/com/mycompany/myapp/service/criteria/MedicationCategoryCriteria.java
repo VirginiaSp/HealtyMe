@@ -1,3 +1,6 @@
+// Replace your MedicationCategoryCriteria.java with this complete version:
+// src/main/java/com/mycompany/myapp/service/criteria/MedicationCategoryCriteria.java
+
 package com.mycompany.myapp.service.criteria;
 
 import java.io.Serializable;
@@ -7,15 +10,6 @@ import org.springdoc.core.annotations.ParameterObject;
 import tech.jhipster.service.Criteria;
 import tech.jhipster.service.filter.*;
 
-/**
- * Criteria class for the {@link com.mycompany.myapp.domain.MedicationCategory} entity. This class is used
- * in {@link com.mycompany.myapp.web.rest.MedicationCategoryResource} to receive all the possible filtering options from
- * the Http GET request parameters.
- * For example the following could be a valid request:
- * {@code /medication-categories?id.greaterThan=5&attr1.contains=something&attr2.specified=false}
- * As Spring is unable to properly convert the types, unless specific {@link Filter} class are used, we need to use
- * fix type specific filters.
- */
 @ParameterObject
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class MedicationCategoryCriteria implements Serializable, Criteria {
@@ -23,15 +17,13 @@ public class MedicationCategoryCriteria implements Serializable, Criteria {
     private static final long serialVersionUID = 1L;
 
     private LongFilter id;
-
     private StringFilter name;
-
     private StringFilter description;
-
-    private LongFilter ownerId;
-
+    private StringFilter color;
+    private StringFilter icon;
+    private LocalDateFilter createdDate;
+    private LongFilter createdById;
     private LongFilter medicationsId;
-
     private Boolean distinct;
 
     public MedicationCategoryCriteria() {}
@@ -40,7 +32,10 @@ public class MedicationCategoryCriteria implements Serializable, Criteria {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.name = other.optionalName().map(StringFilter::copy).orElse(null);
         this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
-        this.ownerId = other.optionalOwnerId().map(LongFilter::copy).orElse(null);
+        this.color = other.optionalColor().map(StringFilter::copy).orElse(null);
+        this.icon = other.optionalIcon().map(StringFilter::copy).orElse(null);
+        this.createdDate = other.optionalCreatedDate().map(LocalDateFilter::copy).orElse(null);
+        this.createdById = other.optionalCreatedById().map(LongFilter::copy).orElse(null);
         this.medicationsId = other.optionalMedicationsId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
@@ -107,23 +102,89 @@ public class MedicationCategoryCriteria implements Serializable, Criteria {
         this.description = description;
     }
 
-    public LongFilter getOwnerId() {
-        return ownerId;
+    public StringFilter getColor() {
+        return color;
     }
 
-    public Optional<LongFilter> optionalOwnerId() {
-        return Optional.ofNullable(ownerId);
+    public Optional<StringFilter> optionalColor() {
+        return Optional.ofNullable(color);
+    }
+
+    public StringFilter color() {
+        if (color == null) {
+            setColor(new StringFilter());
+        }
+        return color;
+    }
+
+    public void setColor(StringFilter color) {
+        this.color = color;
+    }
+
+    public StringFilter getIcon() {
+        return icon;
+    }
+
+    public Optional<StringFilter> optionalIcon() {
+        return Optional.ofNullable(icon);
+    }
+
+    public StringFilter icon() {
+        if (icon == null) {
+            setIcon(new StringFilter());
+        }
+        return icon;
+    }
+
+    public void setIcon(StringFilter icon) {
+        this.icon = icon;
+    }
+
+    public LocalDateFilter getCreatedDate() {
+        return createdDate;
+    }
+
+    public Optional<LocalDateFilter> optionalCreatedDate() {
+        return Optional.ofNullable(createdDate);
+    }
+
+    public LocalDateFilter createdDate() {
+        if (createdDate == null) {
+            setCreatedDate(new LocalDateFilter());
+        }
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDateFilter createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    // This is the method that was missing!
+    public LongFilter getCreatedById() {
+        return createdById;
+    }
+
+    public Optional<LongFilter> optionalCreatedById() {
+        return Optional.ofNullable(createdById);
+    }
+
+    public LongFilter createdById() {
+        if (createdById == null) {
+            setCreatedById(new LongFilter());
+        }
+        return createdById;
+    }
+
+    public LongFilter getOwnerId() {
+        return getCreatedById();
     }
 
     public LongFilter ownerId() {
-        if (ownerId == null) {
-            setOwnerId(new LongFilter());
-        }
-        return ownerId;
+        return createdById();
     }
 
-    public void setOwnerId(LongFilter ownerId) {
-        this.ownerId = ownerId;
+    public void setCreatedById(LongFilter createdById) {
+        this.createdById = createdById;
     }
 
     public LongFilter getMedicationsId() {
@@ -177,7 +238,10 @@ public class MedicationCategoryCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(name, that.name) &&
             Objects.equals(description, that.description) &&
-            Objects.equals(ownerId, that.ownerId) &&
+            Objects.equals(color, that.color) &&
+            Objects.equals(icon, that.icon) &&
+            Objects.equals(createdDate, that.createdDate) &&
+            Objects.equals(createdById, that.createdById) &&
             Objects.equals(medicationsId, that.medicationsId) &&
             Objects.equals(distinct, that.distinct)
         );
@@ -185,19 +249,23 @@ public class MedicationCategoryCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, description, ownerId, medicationsId, distinct);
+        return Objects.hash(id, name, description, color, icon, createdDate, createdById, medicationsId, distinct);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "MedicationCategoryCriteria{" +
-            optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalName().map(f -> "name=" + f + ", ").orElse("") +
-            optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
-            optionalOwnerId().map(f -> "ownerId=" + f + ", ").orElse("") +
-            optionalMedicationsId().map(f -> "medicationsId=" + f + ", ").orElse("") +
-            optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
-        "}";
+        return (
+            "MedicationCategoryCriteria{" +
+            optionalId().map(f -> "id=" + f).orElse("") +
+            optionalName().map(f -> ", name=" + f).orElse("") +
+            optionalDescription().map(f -> ", description=" + f).orElse("") +
+            optionalColor().map(f -> ", color=" + f).orElse("") +
+            optionalIcon().map(f -> ", icon=" + f).orElse("") +
+            optionalCreatedDate().map(f -> ", createdDate=" + f).orElse("") +
+            optionalCreatedById().map(f -> ", createdById=" + f).orElse("") +
+            optionalMedicationsId().map(f -> ", medicationsId=" + f).orElse("") +
+            optionalDistinct().map(f -> ", distinct=" + f).orElse("") +
+            "}"
+        );
     }
 }

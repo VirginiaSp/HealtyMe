@@ -5,16 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-/**
- * Spring Data JPA repository for the Medication entity.
- *
- * When extending this class, extend MedicationRepositoryWithBagRelationships too.
- * For more information refer to https://github.com/jhipster/generator-jhipster/issues/17990.
- */
 @Repository
 public interface MedicationRepository
     extends MedicationRepositoryWithBagRelationships, JpaRepository<Medication, Long>, JpaSpecificationExecutor<Medication> {
@@ -22,26 +17,14 @@ public interface MedicationRepository
     List<Medication> findByOwnerIsCurrentUser();
 
     default Optional<Medication> findOneWithEagerRelationships(Long id) {
-        return this.fetchBagRelationships(this.findOneWithToOneRelationships(id));
+        return this.fetchBagRelationships(this.findById(id));
     }
 
     default List<Medication> findAllWithEagerRelationships() {
-        return this.fetchBagRelationships(this.findAllWithToOneRelationships());
+        return this.fetchBagRelationships(this.findAll());
     }
 
     default Page<Medication> findAllWithEagerRelationships(Pageable pageable) {
-        return this.fetchBagRelationships(this.findAllWithToOneRelationships(pageable));
+        return this.fetchBagRelationships(this.findAll(pageable));
     }
-
-    @Query(
-        value = "select medication from Medication medication left join fetch medication.owner",
-        countQuery = "select count(medication) from Medication medication"
-    )
-    Page<Medication> findAllWithToOneRelationships(Pageable pageable);
-
-    @Query("select medication from Medication medication left join fetch medication.owner")
-    List<Medication> findAllWithToOneRelationships();
-
-    @Query("select medication from Medication medication left join fetch medication.owner where medication.id =:id")
-    Optional<Medication> findOneWithToOneRelationships(@Param("id") Long id);
 }

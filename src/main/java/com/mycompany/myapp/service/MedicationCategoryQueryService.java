@@ -10,6 +10,8 @@ import jakarta.persistence.criteria.JoinType;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +21,7 @@ import tech.jhipster.service.QueryService;
 @Transactional(readOnly = true)
 public class MedicationCategoryQueryService extends QueryService<MedicationCategory> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MedicationCategoryQueryService.class);
+    private static final Logger log = LoggerFactory.getLogger(MedicationCategoryQueryService.class);
 
     private final MedicationCategoryRepository medicationCategoryRepository;
     private final MedicationCategoryMapper medicationCategoryMapper;
@@ -34,25 +36,21 @@ public class MedicationCategoryQueryService extends QueryService<MedicationCateg
 
     @Transactional(readOnly = true)
     public List<MedicationCategoryDTO> findByCriteria(MedicationCategoryCriteria criteria) {
-        LOG.debug("find by criteria : {}", criteria);
+        log.debug("find by criteria : {}", criteria);
         final Specification<MedicationCategory> specification = createSpecification(criteria);
         return medicationCategoryMapper.toDto(medicationCategoryRepository.findAll(specification));
     }
 
     @Transactional(readOnly = true)
     public long countByCriteria(MedicationCategoryCriteria criteria) {
-        LOG.debug("count by criteria : {}", criteria);
+        log.debug("count by criteria : {}", criteria);
         final Specification<MedicationCategory> specification = createSpecification(criteria);
         return medicationCategoryRepository.count(specification);
     }
 
-    // FIXED: Proper null handling instead of using Specification.allOf()
     protected Specification<MedicationCategory> createSpecification(MedicationCategoryCriteria criteria) {
         Specification<MedicationCategory> specification = Specification.where(null);
         if (criteria != null) {
-            if (Boolean.TRUE.equals(criteria.getDistinct())) {
-                specification = specification.and(distinct(criteria.getDistinct()));
-            }
             if (criteria.getId() != null) {
                 specification = specification.and(buildRangeSpecification(criteria.getId(), MedicationCategory_.id));
             }
@@ -62,9 +60,21 @@ public class MedicationCategoryQueryService extends QueryService<MedicationCateg
             if (criteria.getDescription() != null) {
                 specification = specification.and(buildStringSpecification(criteria.getDescription(), MedicationCategory_.description));
             }
-            if (criteria.getOwnerId() != null) {
+            if (criteria.getColor() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getColor(), MedicationCategory_.color));
+            }
+            if (criteria.getIcon() != null) {
+                specification = specification.and(buildStringSpecification(criteria.getIcon(), MedicationCategory_.icon));
+            }
+            if (criteria.getCreatedDate() != null) {
+                specification = specification.and(buildRangeSpecification(criteria.getCreatedDate(), MedicationCategory_.createdDate));
+            }
+            // Fixed: Use createdBy instead of owner
+            if (criteria.getCreatedById() != null) {
                 specification = specification.and(
-                    buildSpecification(criteria.getOwnerId(), root -> root.join(MedicationCategory_.owner, JoinType.LEFT).get(User_.id))
+                    buildSpecification(criteria.getCreatedById(), root ->
+                        root.join(MedicationCategory_.createdBy, JoinType.LEFT).get(User_.id)
+                    )
                 );
             }
             if (criteria.getMedicationsId() != null) {

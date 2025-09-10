@@ -1,9 +1,7 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.MedicationCategoryRepository;
-import com.mycompany.myapp.service.MedicationCategoryQueryService;
 import com.mycompany.myapp.service.MedicationCategoryService;
-import com.mycompany.myapp.service.criteria.MedicationCategoryCriteria;
 import com.mycompany.myapp.service.dto.MedicationCategoryDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -16,9 +14,14 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
+import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
@@ -39,16 +42,12 @@ public class MedicationCategoryResource {
 
     private final MedicationCategoryRepository medicationCategoryRepository;
 
-    private final MedicationCategoryQueryService medicationCategoryQueryService;
-
     public MedicationCategoryResource(
         MedicationCategoryService medicationCategoryService,
-        MedicationCategoryRepository medicationCategoryRepository,
-        MedicationCategoryQueryService medicationCategoryQueryService
+        MedicationCategoryRepository medicationCategoryRepository
     ) {
         this.medicationCategoryService = medicationCategoryService;
         this.medicationCategoryRepository = medicationCategoryRepository;
-        this.medicationCategoryQueryService = medicationCategoryQueryService;
     }
 
     /**
@@ -143,27 +142,24 @@ public class MedicationCategoryResource {
     /**
      * {@code GET  /medication-categories} : get all the medicationCategories.
      *
-     * @param criteria the criteria which the requested entities should match.
+     * @param pageable the pagination information.
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of medicationCategories in body.
      */
     @GetMapping("")
-    public ResponseEntity<List<MedicationCategoryDTO>> getAllMedicationCategories(MedicationCategoryCriteria criteria) {
-        LOG.debug("REST request to get MedicationCategories by criteria: {}", criteria);
-
-        List<MedicationCategoryDTO> entityList = medicationCategoryQueryService.findByCriteria(criteria);
-        return ResponseEntity.ok().body(entityList);
-    }
-
-    /**
-     * {@code GET  /medication-categories/count} : count all the medicationCategories.
-     *
-     * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
-     */
-    @GetMapping("/count")
-    public ResponseEntity<Long> countMedicationCategories(MedicationCategoryCriteria criteria) {
-        LOG.debug("REST request to count MedicationCategories by criteria: {}", criteria);
-        return ResponseEntity.ok().body(medicationCategoryQueryService.countByCriteria(criteria));
+    public ResponseEntity<List<MedicationCategoryDTO>> getAllMedicationCategories(
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+    ) {
+        LOG.debug("REST request to get a page of MedicationCategories");
+        Page<MedicationCategoryDTO> page;
+        if (eagerload) {
+            page = medicationCategoryService.findAllWithEagerRelationships(pageable);
+        } else {
+            page = medicationCategoryService.findAll(pageable);
+        }
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
     /**

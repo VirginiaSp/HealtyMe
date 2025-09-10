@@ -1,0 +1,37 @@
+// medication-enhancement.jdl
+// Add this to extend your existing medication entity with categories
+
+entity MedicationCategory {
+  name String required maxlength(50)
+  description String maxlength(200)
+  color String maxlength(7) // For hex colors like #FF5733
+  icon String maxlength(50) // For FontAwesome icon names
+  createdDate LocalDate
+}
+
+entity Medication {
+  name String required maxlength(100)
+  rating Integer min(1) max(10) required
+  notes TextBlob
+  dosage String maxlength(200)
+  frequency String maxlength(100)
+  sideEffects String maxlength(500)
+  createdDate LocalDate
+  lastTaken LocalDate
+}
+
+// Many-to-Many relationship: One medication can belong to multiple categories
+relationship ManyToMany {
+  Medication{categories(name)} to MedicationCategory{medications(name)}
+}
+
+// Keep the relationship with User (assuming you want to maintain ownership)
+relationship ManyToOne {
+  Medication{owner(login)} to User with builtInEntity
+  MedicationCategory{createdBy(login)} to User with builtInEntity
+}
+
+// Add service layer and pagination
+service all with serviceImpl
+paginate all with pagination
+dto all with mapstruct

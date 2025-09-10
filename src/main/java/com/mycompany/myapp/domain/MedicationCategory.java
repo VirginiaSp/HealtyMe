@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import org.hibernate.annotations.Cache;
@@ -27,16 +28,27 @@ public class MedicationCategory implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false, unique = true)
+    @Size(max = 50)
+    @Column(name = "name", length = 50, nullable = false)
     private String name;
 
-    @Size(max = 500)
-    @Column(name = "description", length = 500)
+    @Size(max = 200)
+    @Column(name = "description", length = 200)
     private String description;
 
-    @ManyToOne(optional = false)
-    @NotNull
-    private User owner;
+    @Size(max = 7)
+    @Column(name = "color", length = 7)
+    private String color;
+
+    @Size(max = 50)
+    @Column(name = "icon", length = 50)
+    private String icon;
+
+    @Column(name = "created_date")
+    private LocalDate createdDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User createdBy;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "categories")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -84,16 +96,55 @@ public class MedicationCategory implements Serializable {
         this.description = description;
     }
 
-    public User getOwner() {
-        return this.owner;
+    public String getColor() {
+        return this.color;
     }
 
-    public void setOwner(User user) {
-        this.owner = user;
+    public MedicationCategory color(String color) {
+        this.setColor(color);
+        return this;
     }
 
-    public MedicationCategory owner(User user) {
-        this.setOwner(user);
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getIcon() {
+        return this.icon;
+    }
+
+    public MedicationCategory icon(String icon) {
+        this.setIcon(icon);
+        return this;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public LocalDate getCreatedDate() {
+        return this.createdDate;
+    }
+
+    public MedicationCategory createdDate(LocalDate createdDate) {
+        this.setCreatedDate(createdDate);
+        return this;
+    }
+
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public User getCreatedBy() {
+        return this.createdBy;
+    }
+
+    public void setCreatedBy(User user) {
+        this.createdBy = user;
+    }
+
+    public MedicationCategory createdBy(User user) {
+        this.setCreatedBy(user);
         return this;
     }
 
@@ -154,6 +205,9 @@ public class MedicationCategory implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", description='" + getDescription() + "'" +
+            ", color='" + getColor() + "'" +
+            ", icon='" + getIcon() + "'" +
+            ", createdDate='" + getCreatedDate() + "'" +
             "}";
     }
 }

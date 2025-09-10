@@ -12,11 +12,11 @@ public class MedicationTestSamples {
     private static final AtomicInteger intCount = new AtomicInteger(random.nextInt() + (2 * Short.MAX_VALUE));
 
     public static Medication getMedicationSample1() {
-        return new Medication().id(1L).name("name1").rating(1).notes("notes1");
+        return new Medication().id(1L).name("name1").rating(1).dosage("dosage1").frequency("frequency1").sideEffects("sideEffects1");
     }
 
     public static Medication getMedicationSample2() {
-        return new Medication().id(2L).name("name2").rating(2).notes("notes2");
+        return new Medication().id(2L).name("name2").rating(2).dosage("dosage2").frequency("frequency2").sideEffects("sideEffects2");
     }
 
     public static Medication getMedicationRandomSampleGenerator() {
@@ -24,6 +24,8 @@ public class MedicationTestSamples {
             .id(longCount.incrementAndGet())
             .name(UUID.randomUUID().toString())
             .rating(intCount.incrementAndGet())
-            .notes(UUID.randomUUID().toString());
+            .dosage(UUID.randomUUID().toString())
+            .frequency(UUID.randomUUID().toString())
+            .sideEffects(UUID.randomUUID().toString());
     }
 }

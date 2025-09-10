@@ -14,17 +14,32 @@
             <column name="id" type="bigint">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="name" type="varchar(255)">
+            <column name="name" type="varchar(100)">
                 <constraints nullable="false" />
             </column>
             <column name="rating" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="notes" type="CLOB">
                 <constraints nullable="true" />
             </column>
-            <column name="notes" type="varchar(1000)">
+            <column name="dosage" type="varchar(200)">
+                <constraints nullable="true" />
+            </column>
+            <column name="frequency" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="side_effects" type="varchar(500)">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_date" type="date">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_taken" type="date">
                 <constraints nullable="true" />
             </column>
             <column name="owner_id" type="bigint">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
@@ -63,8 +78,12 @@
             <column name="id" type="numeric"/>
             <column name="name" type="string"/>
             <column name="rating" type="numeric"/>
-            <column name="notes" type="string"/>
-            <column name="owner_id" type="numeric"/>
+            <column name="notes" type="clob"/>
+            <column name="dosage" type="string"/>
+            <column name="frequency" type="string"/>
+            <column name="side_effects" type="string"/>
+            <column name="created_date" type="date"/>
+            <column name="last_taken" type="date"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

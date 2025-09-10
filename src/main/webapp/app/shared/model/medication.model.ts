@@ -1,12 +1,18 @@
+import dayjs from 'dayjs';
 import { IUser } from 'app/shared/model/user.model';
 import { IMedicationCategory } from 'app/shared/model/medication-category.model';
 
 export interface IMedication {
   id?: number;
   name?: string;
-  rating?: number | null;
+  rating?: number;
   notes?: string | null;
-  owner?: IUser;
+  dosage?: string | null;
+  frequency?: string | null;
+  sideEffects?: string | null;
+  createdDate?: dayjs.Dayjs | null;
+  lastTaken?: dayjs.Dayjs | null;
+  owner?: IUser | null;
   categories?: IMedicationCategory[] | null;
 }
 

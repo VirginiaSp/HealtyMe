@@ -10,15 +10,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.myapp.IntegrationTest;
-import com.mycompany.myapp.domain.Medication;
 import com.mycompany.myapp.domain.MedicationCategory;
-import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.MedicationCategoryRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.service.MedicationCategoryService;
 import com.mycompany.myapp.service.dto.MedicationCategoryDTO;
 import com.mycompany.myapp.service.mapper.MedicationCategoryMapper;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -51,6 +51,15 @@ class MedicationCategoryResourceIT {
 
     private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
     private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
+
+    private static final String DEFAULT_COLOR = "AAAAAAA";
+    private static final String UPDATED_COLOR = "BBBBBBB";
+
+    private static final String DEFAULT_ICON = "AAAAAAAAAA";
+    private static final String UPDATED_ICON = "BBBBBBBBBB";
+
+    private static final LocalDate DEFAULT_CREATED_DATE = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_CREATED_DATE = LocalDate.now(ZoneId.systemDefault());
 
     private static final String ENTITY_API_URL = "/api/medication-categories";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -92,14 +101,13 @@ class MedicationCategoryResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static MedicationCategory createEntity(EntityManager em) {
-        MedicationCategory medicationCategory = new MedicationCategory().name(DEFAULT_NAME).description(DEFAULT_DESCRIPTION);
-        // Add required entity
-        User user = UserResourceIT.createEntity();
-        em.persist(user);
-        em.flush();
-        medicationCategory.setOwner(user);
-        return medicationCategory;
+    public static MedicationCategory createEntity() {
+        return new MedicationCategory()
+            .name(DEFAULT_NAME)
+            .description(DEFAULT_DESCRIPTION)
+            .color(DEFAULT_COLOR)
+            .icon(DEFAULT_ICON)
+            .createdDate(DEFAULT_CREATED_DATE);
     }
 
     /**
@@ -108,19 +116,18 @@ class MedicationCategoryResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static MedicationCategory createUpdatedEntity(EntityManager em) {
-        MedicationCategory updatedMedicationCategory = new MedicationCategory().name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
-        // Add required entity
-        User user = UserResourceIT.createEntity();
-        em.persist(user);
-        em.flush();
-        updatedMedicationCategory.setOwner(user);
-        return updatedMedicationCategory;
+    public static MedicationCategory createUpdatedEntity() {
+        return new MedicationCategory()
+            .name(UPDATED_NAME)
+            .description(UPDATED_DESCRIPTION)
+            .color(UPDATED_COLOR)
+            .icon(UPDATED_ICON)
+            .createdDate(UPDATED_CREATED_DATE);
     }
 
     @BeforeEach
     void initTest() {
-        medicationCategory = createEntity(em);
+        medicationCategory = createEntity();
     }
 
     @AfterEach
@@ -206,7 +213,10 @@ class MedicationCategoryResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(medicationCategory.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].color").value(hasItem(DEFAULT_COLOR)))
+            .andExpect(jsonPath("$.[*].icon").value(hasItem(DEFAULT_ICON)))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -239,216 +249,10 @@ class MedicationCategoryResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(medicationCategory.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION));
-    }
-
-    @Test
-    @Transactional
-    void getMedicationCategoriesByIdFiltering() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        Long id = medicationCategory.getId();
-
-        defaultMedicationCategoryFiltering("id.equals=" + id, "id.notEquals=" + id);
-
-        defaultMedicationCategoryFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
-
-        defaultMedicationCategoryFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByNameIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where name equals to
-        defaultMedicationCategoryFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByNameIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where name in
-        defaultMedicationCategoryFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByNameIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where name is not null
-        defaultMedicationCategoryFiltering("name.specified=true", "name.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByNameContainsSomething() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where name contains
-        defaultMedicationCategoryFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByNameNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where name does not contain
-        defaultMedicationCategoryFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByDescriptionIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where description equals to
-        defaultMedicationCategoryFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByDescriptionIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where description in
-        defaultMedicationCategoryFiltering(
-            "description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION,
-            "description.in=" + UPDATED_DESCRIPTION
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByDescriptionIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where description is not null
-        defaultMedicationCategoryFiltering("description.specified=true", "description.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByDescriptionContainsSomething() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where description contains
-        defaultMedicationCategoryFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByDescriptionNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedMedicationCategory = medicationCategoryRepository.saveAndFlush(medicationCategory);
-
-        // Get all the medicationCategoryList where description does not contain
-        defaultMedicationCategoryFiltering(
-            "description.doesNotContain=" + UPDATED_DESCRIPTION,
-            "description.doesNotContain=" + DEFAULT_DESCRIPTION
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByOwnerIsEqualToSomething() throws Exception {
-        User owner;
-        if (TestUtil.findAll(em, User.class).isEmpty()) {
-            medicationCategoryRepository.saveAndFlush(medicationCategory);
-            owner = UserResourceIT.createEntity();
-        } else {
-            owner = TestUtil.findAll(em, User.class).get(0);
-        }
-        em.persist(owner);
-        em.flush();
-        medicationCategory.setOwner(owner);
-        medicationCategoryRepository.saveAndFlush(medicationCategory);
-        Long ownerId = owner.getId();
-        // Get all the medicationCategoryList where owner equals to ownerId
-        defaultMedicationCategoryShouldBeFound("ownerId.equals=" + ownerId);
-
-        // Get all the medicationCategoryList where owner equals to (ownerId + 1)
-        defaultMedicationCategoryShouldNotBeFound("ownerId.equals=" + (ownerId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationCategoriesByMedicationsIsEqualToSomething() throws Exception {
-        Medication medications;
-        if (TestUtil.findAll(em, Medication.class).isEmpty()) {
-            medicationCategoryRepository.saveAndFlush(medicationCategory);
-            medications = MedicationResourceIT.createEntity(em);
-        } else {
-            medications = TestUtil.findAll(em, Medication.class).get(0);
-        }
-        em.persist(medications);
-        em.flush();
-        medicationCategory.addMedications(medications);
-        medicationCategoryRepository.saveAndFlush(medicationCategory);
-        Long medicationsId = medications.getId();
-        // Get all the medicationCategoryList where medications equals to medicationsId
-        defaultMedicationCategoryShouldBeFound("medicationsId.equals=" + medicationsId);
-
-        // Get all the medicationCategoryList where medications equals to (medicationsId + 1)
-        defaultMedicationCategoryShouldNotBeFound("medicationsId.equals=" + (medicationsId + 1));
-    }
-
-    private void defaultMedicationCategoryFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
-        defaultMedicationCategoryShouldBeFound(shouldBeFound);
-        defaultMedicationCategoryShouldNotBeFound(shouldNotBeFound);
-    }
-
-    /**
-     * Executes the search, and checks that the default entity is returned.
-     */
-    private void defaultMedicationCategoryShouldBeFound(String filter) throws Exception {
-        restMedicationCategoryMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(medicationCategory.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)));
-
-        // Check, that the count call also returns 1
-        restMedicationCategoryMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(content().string("1"));
-    }
-
-    /**
-     * Executes the search, and checks that the default entity is not returned.
-     */
-    private void defaultMedicationCategoryShouldNotBeFound(String filter) throws Exception {
-        restMedicationCategoryMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$").isEmpty());
-
-        // Check, that the count call also returns 0
-        restMedicationCategoryMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(content().string("0"));
+            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
+            .andExpect(jsonPath("$.color").value(DEFAULT_COLOR))
+            .andExpect(jsonPath("$.icon").value(DEFAULT_ICON))
+            .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()));
     }
 
     @Test
@@ -470,7 +274,12 @@ class MedicationCategoryResourceIT {
         MedicationCategory updatedMedicationCategory = medicationCategoryRepository.findById(medicationCategory.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedMedicationCategory are not directly saved in db
         em.detach(updatedMedicationCategory);
-        updatedMedicationCategory.name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
+        updatedMedicationCategory
+            .name(UPDATED_NAME)
+            .description(UPDATED_DESCRIPTION)
+            .color(UPDATED_COLOR)
+            .icon(UPDATED_ICON)
+            .createdDate(UPDATED_CREATED_DATE);
         MedicationCategoryDTO medicationCategoryDTO = medicationCategoryMapper.toDto(updatedMedicationCategory);
 
         restMedicationCategoryMockMvc
@@ -560,6 +369,8 @@ class MedicationCategoryResourceIT {
         MedicationCategory partialUpdatedMedicationCategory = new MedicationCategory();
         partialUpdatedMedicationCategory.setId(medicationCategory.getId());
 
+        partialUpdatedMedicationCategory.name(UPDATED_NAME).createdDate(UPDATED_CREATED_DATE);
+
         restMedicationCategoryMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedMedicationCategory.getId())
@@ -589,7 +400,12 @@ class MedicationCategoryResourceIT {
         MedicationCategory partialUpdatedMedicationCategory = new MedicationCategory();
         partialUpdatedMedicationCategory.setId(medicationCategory.getId());
 
-        partialUpdatedMedicationCategory.name(UPDATED_NAME).description(UPDATED_DESCRIPTION);
+        partialUpdatedMedicationCategory
+            .name(UPDATED_NAME)
+            .description(UPDATED_DESCRIPTION)
+            .color(UPDATED_COLOR)
+            .icon(UPDATED_ICON)
+            .createdDate(UPDATED_CREATED_DATE);
 
         restMedicationCategoryMockMvc
             .perform(

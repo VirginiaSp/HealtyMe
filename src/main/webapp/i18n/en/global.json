@@ -8,16 +8,8 @@
       "entities": {
         "main": "Entities",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
-        "userProfile": "User Profile",
-        "doctor": "Doctor",
-        "visit": "Visit",
-        "appointment": "Appointment",
         "medicationCategory": "Medication Category",
-        "medication": "Medication",
-        "medicationPlan": "Medication Plan",
-        "medicationPlanDose": "Medication Plan Dose",
-        "examinationCategory": "Examination Category",
-        "examinationRecord": "Examination Record"
+        "medication": "Medication"
       },
       "account": {
         "main": "Account",

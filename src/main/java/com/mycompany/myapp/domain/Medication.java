@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import org.hibernate.annotations.Cache;
@@ -27,20 +28,39 @@ public class Medication implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "name", nullable = false)
+    @Size(max = 100)
+    @Column(name = "name", length = 100, nullable = false)
     private String name;
 
-    @Min(value = 0)
+    @NotNull
+    @Min(value = 1)
     @Max(value = 10)
-    @Column(name = "rating")
+    @Column(name = "rating", nullable = false)
     private Integer rating;
 
-    @Size(max = 1000)
-    @Column(name = "notes", length = 1000)
+    @Lob
+    @Column(name = "notes")
     private String notes;
 
-    @ManyToOne(optional = false)
-    @NotNull
+    @Size(max = 200)
+    @Column(name = "dosage", length = 200)
+    private String dosage;
+
+    @Size(max = 100)
+    @Column(name = "frequency", length = 100)
+    private String frequency;
+
+    @Size(max = 500)
+    @Column(name = "side_effects", length = 500)
+    private String sideEffects;
+
+    @Column(name = "created_date")
+    private LocalDate createdDate;
+
+    @Column(name = "last_taken")
+    private LocalDate lastTaken;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -50,7 +70,7 @@ public class Medication implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "categories_id")
     )
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "owner", "medications" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "createdBy", "medications" }, allowSetters = true)
     private Set<MedicationCategory> categories = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -105,6 +125,71 @@ public class Medication implements Serializable {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getDosage() {
+        return this.dosage;
+    }
+
+    public Medication dosage(String dosage) {
+        this.setDosage(dosage);
+        return this;
+    }
+
+    public void setDosage(String dosage) {
+        this.dosage = dosage;
+    }
+
+    public String getFrequency() {
+        return this.frequency;
+    }
+
+    public Medication frequency(String frequency) {
+        this.setFrequency(frequency);
+        return this;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+
+    public String getSideEffects() {
+        return this.sideEffects;
+    }
+
+    public Medication sideEffects(String sideEffects) {
+        this.setSideEffects(sideEffects);
+        return this;
+    }
+
+    public void setSideEffects(String sideEffects) {
+        this.sideEffects = sideEffects;
+    }
+
+    public LocalDate getCreatedDate() {
+        return this.createdDate;
+    }
+
+    public Medication createdDate(LocalDate createdDate) {
+        this.setCreatedDate(createdDate);
+        return this;
+    }
+
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDate getLastTaken() {
+        return this.lastTaken;
+    }
+
+    public Medication lastTaken(LocalDate lastTaken) {
+        this.setLastTaken(lastTaken);
+        return this;
+    }
+
+    public void setLastTaken(LocalDate lastTaken) {
+        this.lastTaken = lastTaken;
     }
 
     public User getOwner() {
@@ -170,6 +255,11 @@ public class Medication implements Serializable {
             ", name='" + getName() + "'" +
             ", rating=" + getRating() +
             ", notes='" + getNotes() + "'" +
+            ", dosage='" + getDosage() + "'" +
+            ", frequency='" + getFrequency() + "'" +
+            ", sideEffects='" + getSideEffects() + "'" +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastTaken='" + getLastTaken() + "'" +
             "}";
     }
 }

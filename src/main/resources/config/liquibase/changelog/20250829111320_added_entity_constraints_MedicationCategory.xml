@@ -10,9 +10,9 @@
     -->
     <changeSet id="20250829111320-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="owner_id"
+        <addForeignKeyConstraint baseColumnNames="created_by_id"
                                  baseTableName="medication_category"
-                                 constraintName="fk_medication_category__owner_id"
+                                 constraintName="fk_medication_category__created_by_id"
                                  referencedColumnNames="id"
                                  referencedTableName="jhi_user"
                                  />

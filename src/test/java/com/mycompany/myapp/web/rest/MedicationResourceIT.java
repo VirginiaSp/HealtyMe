@@ -11,14 +11,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycompany.myapp.IntegrationTest;
 import com.mycompany.myapp.domain.Medication;
-import com.mycompany.myapp.domain.MedicationCategory;
-import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.MedicationRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.service.MedicationService;
 import com.mycompany.myapp.service.dto.MedicationDTO;
 import com.mycompany.myapp.service.mapper.MedicationMapper;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,12 +49,26 @@ class MedicationResourceIT {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    private static final Integer DEFAULT_RATING = 0;
-    private static final Integer UPDATED_RATING = 1;
-    private static final Integer SMALLER_RATING = 0 - 1;
+    private static final Integer DEFAULT_RATING = 1;
+    private static final Integer UPDATED_RATING = 2;
 
     private static final String DEFAULT_NOTES = "AAAAAAAAAA";
     private static final String UPDATED_NOTES = "BBBBBBBBBB";
+
+    private static final String DEFAULT_DOSAGE = "AAAAAAAAAA";
+    private static final String UPDATED_DOSAGE = "BBBBBBBBBB";
+
+    private static final String DEFAULT_FREQUENCY = "AAAAAAAAAA";
+    private static final String UPDATED_FREQUENCY = "BBBBBBBBBB";
+
+    private static final String DEFAULT_SIDE_EFFECTS = "AAAAAAAAAA";
+    private static final String UPDATED_SIDE_EFFECTS = "BBBBBBBBBB";
+
+    private static final LocalDate DEFAULT_CREATED_DATE = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_CREATED_DATE = LocalDate.now(ZoneId.systemDefault());
+
+    private static final LocalDate DEFAULT_LAST_TAKEN = LocalDate.ofEpochDay(0L);
+    private static final LocalDate UPDATED_LAST_TAKEN = LocalDate.now(ZoneId.systemDefault());
 
     private static final String ENTITY_API_URL = "/api/medications";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -96,14 +110,16 @@ class MedicationResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Medication createEntity(EntityManager em) {
-        Medication medication = new Medication().name(DEFAULT_NAME).rating(DEFAULT_RATING).notes(DEFAULT_NOTES);
-        // Add required entity
-        User user = UserResourceIT.createEntity();
-        em.persist(user);
-        em.flush();
-        medication.setOwner(user);
-        return medication;
+    public static Medication createEntity() {
+        return new Medication()
+            .name(DEFAULT_NAME)
+            .rating(DEFAULT_RATING)
+            .notes(DEFAULT_NOTES)
+            .dosage(DEFAULT_DOSAGE)
+            .frequency(DEFAULT_FREQUENCY)
+            .sideEffects(DEFAULT_SIDE_EFFECTS)
+            .createdDate(DEFAULT_CREATED_DATE)
+            .lastTaken(DEFAULT_LAST_TAKEN);
     }
 
     /**
@@ -112,19 +128,21 @@ class MedicationResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Medication createUpdatedEntity(EntityManager em) {
-        Medication updatedMedication = new Medication().name(UPDATED_NAME).rating(UPDATED_RATING).notes(UPDATED_NOTES);
-        // Add required entity
-        User user = UserResourceIT.createEntity();
-        em.persist(user);
-        em.flush();
-        updatedMedication.setOwner(user);
-        return updatedMedication;
+    public static Medication createUpdatedEntity() {
+        return new Medication()
+            .name(UPDATED_NAME)
+            .rating(UPDATED_RATING)
+            .notes(UPDATED_NOTES)
+            .dosage(UPDATED_DOSAGE)
+            .frequency(UPDATED_FREQUENCY)
+            .sideEffects(UPDATED_SIDE_EFFECTS)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastTaken(UPDATED_LAST_TAKEN);
     }
 
     @BeforeEach
     void initTest() {
-        medication = createEntity(em);
+        medication = createEntity();
     }
 
     @AfterEach
@@ -196,6 +214,23 @@ class MedicationResourceIT {
 
     @Test
     @Transactional
+    void checkRatingIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        medication.setRating(null);
+
+        // Create the Medication, which fails.
+        MedicationDTO medicationDTO = medicationMapper.toDto(medication);
+
+        restMedicationMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(medicationDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllMedications() throws Exception {
         // Initialize the database
         insertedMedication = medicationRepository.saveAndFlush(medication);
@@ -208,7 +243,12 @@ class MedicationResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(medication.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
             .andExpect(jsonPath("$.[*].rating").value(hasItem(DEFAULT_RATING)))
-            .andExpect(jsonPath("$.[*].notes").value(hasItem(DEFAULT_NOTES)));
+            .andExpect(jsonPath("$.[*].notes").value(hasItem(DEFAULT_NOTES)))
+            .andExpect(jsonPath("$.[*].dosage").value(hasItem(DEFAULT_DOSAGE)))
+            .andExpect(jsonPath("$.[*].frequency").value(hasItem(DEFAULT_FREQUENCY)))
+            .andExpect(jsonPath("$.[*].sideEffects").value(hasItem(DEFAULT_SIDE_EFFECTS)))
+            .andExpect(jsonPath("$.[*].createdDate").value(hasItem(DEFAULT_CREATED_DATE.toString())))
+            .andExpect(jsonPath("$.[*].lastTaken").value(hasItem(DEFAULT_LAST_TAKEN.toString())));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -242,281 +282,12 @@ class MedicationResourceIT {
             .andExpect(jsonPath("$.id").value(medication.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
             .andExpect(jsonPath("$.rating").value(DEFAULT_RATING))
-            .andExpect(jsonPath("$.notes").value(DEFAULT_NOTES));
-    }
-
-    @Test
-    @Transactional
-    void getMedicationsByIdFiltering() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        Long id = medication.getId();
-
-        defaultMedicationFiltering("id.equals=" + id, "id.notEquals=" + id);
-
-        defaultMedicationFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
-
-        defaultMedicationFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNameIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where name equals to
-        defaultMedicationFiltering("name.equals=" + DEFAULT_NAME, "name.equals=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNameIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where name in
-        defaultMedicationFiltering("name.in=" + DEFAULT_NAME + "," + UPDATED_NAME, "name.in=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNameIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where name is not null
-        defaultMedicationFiltering("name.specified=true", "name.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNameContainsSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where name contains
-        defaultMedicationFiltering("name.contains=" + DEFAULT_NAME, "name.contains=" + UPDATED_NAME);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNameNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where name does not contain
-        defaultMedicationFiltering("name.doesNotContain=" + UPDATED_NAME, "name.doesNotContain=" + DEFAULT_NAME);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByRatingIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where rating equals to
-        defaultMedicationFiltering("rating.equals=" + DEFAULT_RATING, "rating.equals=" + UPDATED_RATING);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByRatingIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where rating in
-        defaultMedicationFiltering("rating.in=" + DEFAULT_RATING + "," + UPDATED_RATING, "rating.in=" + UPDATED_RATING);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByRatingIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where rating is not null
-        defaultMedicationFiltering("rating.specified=true", "rating.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByRatingIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where rating is greater than or equal to
-        defaultMedicationFiltering("rating.greaterThanOrEqual=" + DEFAULT_RATING, "rating.greaterThanOrEqual=" + (DEFAULT_RATING + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByRatingIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where rating is less than or equal to
-        defaultMedicationFiltering("rating.lessThanOrEqual=" + DEFAULT_RATING, "rating.lessThanOrEqual=" + SMALLER_RATING);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByRatingIsLessThanSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where rating is less than
-        defaultMedicationFiltering("rating.lessThan=" + (DEFAULT_RATING + 1), "rating.lessThan=" + DEFAULT_RATING);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByRatingIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where rating is greater than
-        defaultMedicationFiltering("rating.greaterThan=" + SMALLER_RATING, "rating.greaterThan=" + DEFAULT_RATING);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNotesIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where notes equals to
-        defaultMedicationFiltering("notes.equals=" + DEFAULT_NOTES, "notes.equals=" + UPDATED_NOTES);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNotesIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where notes in
-        defaultMedicationFiltering("notes.in=" + DEFAULT_NOTES + "," + UPDATED_NOTES, "notes.in=" + UPDATED_NOTES);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNotesIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where notes is not null
-        defaultMedicationFiltering("notes.specified=true", "notes.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNotesContainsSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where notes contains
-        defaultMedicationFiltering("notes.contains=" + DEFAULT_NOTES, "notes.contains=" + UPDATED_NOTES);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByNotesNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedMedication = medicationRepository.saveAndFlush(medication);
-
-        // Get all the medicationList where notes does not contain
-        defaultMedicationFiltering("notes.doesNotContain=" + UPDATED_NOTES, "notes.doesNotContain=" + DEFAULT_NOTES);
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByOwnerIsEqualToSomething() throws Exception {
-        User owner;
-        if (TestUtil.findAll(em, User.class).isEmpty()) {
-            medicationRepository.saveAndFlush(medication);
-            owner = UserResourceIT.createEntity();
-        } else {
-            owner = TestUtil.findAll(em, User.class).get(0);
-        }
-        em.persist(owner);
-        em.flush();
-        medication.setOwner(owner);
-        medicationRepository.saveAndFlush(medication);
-        Long ownerId = owner.getId();
-        // Get all the medicationList where owner equals to ownerId
-        defaultMedicationShouldBeFound("ownerId.equals=" + ownerId);
-
-        // Get all the medicationList where owner equals to (ownerId + 1)
-        defaultMedicationShouldNotBeFound("ownerId.equals=" + (ownerId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllMedicationsByCategoriesIsEqualToSomething() throws Exception {
-        MedicationCategory categories;
-        if (TestUtil.findAll(em, MedicationCategory.class).isEmpty()) {
-            medicationRepository.saveAndFlush(medication);
-            categories = MedicationCategoryResourceIT.createEntity(em);
-        } else {
-            categories = TestUtil.findAll(em, MedicationCategory.class).get(0);
-        }
-        em.persist(categories);
-        em.flush();
-        medication.addCategories(categories);
-        medicationRepository.saveAndFlush(medication);
-        Long categoriesId = categories.getId();
-        // Get all the medicationList where categories equals to categoriesId
-        defaultMedicationShouldBeFound("categoriesId.equals=" + categoriesId);
-
-        // Get all the medicationList where categories equals to (categoriesId + 1)
-        defaultMedicationShouldNotBeFound("categoriesId.equals=" + (categoriesId + 1));
-    }
-
-    private void defaultMedicationFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
-        defaultMedicationShouldBeFound(shouldBeFound);
-        defaultMedicationShouldNotBeFound(shouldNotBeFound);
-    }
-
-    /**
-     * Executes the search, and checks that the default entity is returned.
-     */
-    private void defaultMedicationShouldBeFound(String filter) throws Exception {
-        restMedicationMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(medication.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].rating").value(hasItem(DEFAULT_RATING)))
-            .andExpect(jsonPath("$.[*].notes").value(hasItem(DEFAULT_NOTES)));
-
-        // Check, that the count call also returns 1
-        restMedicationMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(content().string("1"));
-    }
-
-    /**
-     * Executes the search, and checks that the default entity is not returned.
-     */
-    private void defaultMedicationShouldNotBeFound(String filter) throws Exception {
-        restMedicationMockMvc
-            .perform(get(ENTITY_API_URL + "?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$").isArray())
-            .andExpect(jsonPath("$").isEmpty());
-
-        // Check, that the count call also returns 0
-        restMedicationMockMvc
-            .perform(get(ENTITY_API_URL + "/count?sort=id,desc&" + filter))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(content().string("0"));
+            .andExpect(jsonPath("$.notes").value(DEFAULT_NOTES))
+            .andExpect(jsonPath("$.dosage").value(DEFAULT_DOSAGE))
+            .andExpect(jsonPath("$.frequency").value(DEFAULT_FREQUENCY))
+            .andExpect(jsonPath("$.sideEffects").value(DEFAULT_SIDE_EFFECTS))
+            .andExpect(jsonPath("$.createdDate").value(DEFAULT_CREATED_DATE.toString()))
+            .andExpect(jsonPath("$.lastTaken").value(DEFAULT_LAST_TAKEN.toString()));
     }
 
     @Test
@@ -538,7 +309,15 @@ class MedicationResourceIT {
         Medication updatedMedication = medicationRepository.findById(medication.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedMedication are not directly saved in db
         em.detach(updatedMedication);
-        updatedMedication.name(UPDATED_NAME).rating(UPDATED_RATING).notes(UPDATED_NOTES);
+        updatedMedication
+            .name(UPDATED_NAME)
+            .rating(UPDATED_RATING)
+            .notes(UPDATED_NOTES)
+            .dosage(UPDATED_DOSAGE)
+            .frequency(UPDATED_FREQUENCY)
+            .sideEffects(UPDATED_SIDE_EFFECTS)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastTaken(UPDATED_LAST_TAKEN);
         MedicationDTO medicationDTO = medicationMapper.toDto(updatedMedication);
 
         restMedicationMockMvc
@@ -628,7 +407,13 @@ class MedicationResourceIT {
         Medication partialUpdatedMedication = new Medication();
         partialUpdatedMedication.setId(medication.getId());
 
-        partialUpdatedMedication.name(UPDATED_NAME).notes(UPDATED_NOTES);
+        partialUpdatedMedication
+            .name(UPDATED_NAME)
+            .rating(UPDATED_RATING)
+            .notes(UPDATED_NOTES)
+            .frequency(UPDATED_FREQUENCY)
+            .sideEffects(UPDATED_SIDE_EFFECTS)
+            .createdDate(UPDATED_CREATED_DATE);
 
         restMedicationMockMvc
             .perform(
@@ -659,7 +444,15 @@ class MedicationResourceIT {
         Medication partialUpdatedMedication = new Medication();
         partialUpdatedMedication.setId(medication.getId());
 
-        partialUpdatedMedication.name(UPDATED_NAME).rating(UPDATED_RATING).notes(UPDATED_NOTES);
+        partialUpdatedMedication
+            .name(UPDATED_NAME)
+            .rating(UPDATED_RATING)
+            .notes(UPDATED_NOTES)
+            .dosage(UPDATED_DOSAGE)
+            .frequency(UPDATED_FREQUENCY)
+            .sideEffects(UPDATED_SIDE_EFFECTS)
+            .createdDate(UPDATED_CREATED_DATE)
+            .lastTaken(UPDATED_LAST_TAKEN);
 
         restMedicationMockMvc
             .perform(

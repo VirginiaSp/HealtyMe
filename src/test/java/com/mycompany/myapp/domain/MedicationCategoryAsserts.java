@@ -48,7 +48,10 @@ public class MedicationCategoryAsserts {
         assertThat(actual)
             .as("Verify MedicationCategory relevant properties")
             .satisfies(a -> assertThat(a.getName()).as("check name").isEqualTo(expected.getName()))
-            .satisfies(a -> assertThat(a.getDescription()).as("check description").isEqualTo(expected.getDescription()));
+            .satisfies(a -> assertThat(a.getDescription()).as("check description").isEqualTo(expected.getDescription()))
+            .satisfies(a -> assertThat(a.getColor()).as("check color").isEqualTo(expected.getColor()))
+            .satisfies(a -> assertThat(a.getIcon()).as("check icon").isEqualTo(expected.getIcon()))
+            .satisfies(a -> assertThat(a.getCreatedDate()).as("check createdDate").isEqualTo(expected.getCreatedDate()));
     }
 
     /**

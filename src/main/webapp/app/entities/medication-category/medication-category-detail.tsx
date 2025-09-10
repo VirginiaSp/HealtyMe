@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Col, Row } from 'reactstrap';
-import { Translate } from 'react-jhipster';
+import { TextFormat, Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntity } from './medication-category.reducer';
@@ -44,9 +45,31 @@ export const MedicationCategoryDetail = () => {
           </dt>
           <dd>{medicationCategoryEntity.description}</dd>
           <dt>
-            <Translate contentKey="healthyMeApp.medicationCategory.owner">Owner</Translate>
+            <span id="color">
+              <Translate contentKey="healthyMeApp.medicationCategory.color">Color</Translate>
+            </span>
           </dt>
-          <dd>{medicationCategoryEntity.owner ? medicationCategoryEntity.owner.login : ''}</dd>
+          <dd>{medicationCategoryEntity.color}</dd>
+          <dt>
+            <span id="icon">
+              <Translate contentKey="healthyMeApp.medicationCategory.icon">Icon</Translate>
+            </span>
+          </dt>
+          <dd>{medicationCategoryEntity.icon}</dd>
+          <dt>
+            <span id="createdDate">
+              <Translate contentKey="healthyMeApp.medicationCategory.createdDate">Created Date</Translate>
+            </span>
+          </dt>
+          <dd>
+            {medicationCategoryEntity.createdDate ? (
+              <TextFormat value={medicationCategoryEntity.createdDate} type="date" format={APP_LOCAL_DATE_FORMAT} />
+            ) : null}
+          </dd>
+          <dt>
+            <Translate contentKey="healthyMeApp.medicationCategory.createdBy">Created By</Translate>
+          </dt>
+          <dd>{medicationCategoryEntity.createdBy ? medicationCategoryEntity.createdBy.login : ''}</dd>
           <dt>
             <Translate contentKey="healthyMeApp.medicationCategory.medications">Medications</Translate>
           </dt>
@@ -54,7 +77,7 @@ export const MedicationCategoryDetail = () => {
             {medicationCategoryEntity.medications
               ? medicationCategoryEntity.medications.map((val, i) => (
                   <span key={val.id}>
-                    <a>{val.id}</a>
+                    <a>{val.name}</a>
                     {medicationCategoryEntity.medications && i === medicationCategoryEntity.medications.length - 1 ? '' : ', '}
                   </span>
                 ))

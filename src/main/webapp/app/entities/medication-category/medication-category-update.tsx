@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Col, FormText, Row } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -27,7 +27,7 @@ export const MedicationCategoryUpdate = () => {
   const updateSuccess = useAppSelector(state => state.medicationCategory.updateSuccess);
 
   const handleClose = () => {
-    navigate('/medication-category');
+    navigate(`/medication-category${location.search}`);
   };
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export const MedicationCategoryUpdate = () => {
     const entity = {
       ...medicationCategoryEntity,
       ...values,
-      owner: users.find(it => it.id.toString() === values.owner?.toString()),
+      createdBy: users.find(it => it.id.toString() === values.createdBy?.toString()),
       medications: mapIdList(values.medications),
     };
 
@@ -71,7 +71,7 @@ export const MedicationCategoryUpdate = () => {
       ? {}
       : {
           ...medicationCategoryEntity,
-          owner: medicationCategoryEntity?.owner?.id,
+          createdBy: medicationCategoryEntity?.createdBy?.id,
           medications: medicationCategoryEntity?.medications?.map(e => e.id.toString()),
         };
 
@@ -108,6 +108,7 @@ export const MedicationCategoryUpdate = () => {
                 type="text"
                 validate={{
                   required: { value: true, message: translate('entity.validation.required') },
+                  maxLength: { value: 50, message: translate('entity.validation.maxlength', { max: 50 }) },
                 }}
               />
               <ValidatedField
@@ -117,16 +118,42 @@ export const MedicationCategoryUpdate = () => {
                 data-cy="description"
                 type="text"
                 validate={{
-                  maxLength: { value: 500, message: translate('entity.validation.maxlength', { max: 500 }) },
+                  maxLength: { value: 200, message: translate('entity.validation.maxlength', { max: 200 }) },
                 }}
               />
               <ValidatedField
-                id="medication-category-owner"
-                name="owner"
-                data-cy="owner"
-                label={translate('healthyMeApp.medicationCategory.owner')}
+                label={translate('healthyMeApp.medicationCategory.color')}
+                id="medication-category-color"
+                name="color"
+                data-cy="color"
+                type="text"
+                validate={{
+                  maxLength: { value: 7, message: translate('entity.validation.maxlength', { max: 7 }) },
+                }}
+              />
+              <ValidatedField
+                label={translate('healthyMeApp.medicationCategory.icon')}
+                id="medication-category-icon"
+                name="icon"
+                data-cy="icon"
+                type="text"
+                validate={{
+                  maxLength: { value: 50, message: translate('entity.validation.maxlength', { max: 50 }) },
+                }}
+              />
+              <ValidatedField
+                label={translate('healthyMeApp.medicationCategory.createdDate')}
+                id="medication-category-createdDate"
+                name="createdDate"
+                data-cy="createdDate"
+                type="date"
+              />
+              <ValidatedField
+                id="medication-category-createdBy"
+                name="createdBy"
+                data-cy="createdBy"
+                label={translate('healthyMeApp.medicationCategory.createdBy')}
                 type="select"
-                required
               >
                 <option value="" key="0" />
                 {users
@@ -137,9 +164,6 @@ export const MedicationCategoryUpdate = () => {
                     ))
                   : null}
               </ValidatedField>
-              <FormText>
-                <Translate contentKey="entity.validation.required">This field is required.</Translate>
-              </FormText>
               <ValidatedField
                 label={translate('healthyMeApp.medicationCategory.medications')}
                 id="medication-category-medications"
@@ -152,7 +176,7 @@ export const MedicationCategoryUpdate = () => {
                 {medications
                   ? medications.map(otherEntity => (
                       <option value={otherEntity.id} key={otherEntity.id}>
-                        {otherEntity.id}
+                        {otherEntity.name}
                       </option>
                     ))
                   : null}

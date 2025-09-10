@@ -1,9 +1,7 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.repository.MedicationRepository;
-import com.mycompany.myapp.service.MedicationQueryService;
 import com.mycompany.myapp.service.MedicationService;
-import com.mycompany.myapp.service.criteria.MedicationCriteria;
 import com.mycompany.myapp.service.dto.MedicationDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -44,16 +42,9 @@ public class MedicationResource {
 
     private final MedicationRepository medicationRepository;
 
-    private final MedicationQueryService medicationQueryService;
-
-    public MedicationResource(
-        MedicationService medicationService,
-        MedicationRepository medicationRepository,
-        MedicationQueryService medicationQueryService
-    ) {
+    public MedicationResource(MedicationService medicationService, MedicationRepository medicationRepository) {
         this.medicationService = medicationService;
         this.medicationRepository = medicationRepository;
-        this.medicationQueryService = medicationQueryService;
     }
 
     /**
@@ -148,31 +139,23 @@ public class MedicationResource {
      * {@code GET  /medications} : get all the medications.
      *
      * @param pageable the pagination information.
-     * @param criteria the criteria which the requested entities should match.
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of medications in body.
      */
     @GetMapping("")
     public ResponseEntity<List<MedicationDTO>> getAllMedications(
-        MedicationCriteria criteria,
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
     ) {
-        LOG.debug("REST request to get Medications by criteria: {}", criteria);
-
-        Page<MedicationDTO> page = medicationQueryService.findByCriteria(criteria, pageable);
+        LOG.debug("REST request to get a page of Medications");
+        Page<MedicationDTO> page;
+        if (eagerload) {
+            page = medicationService.findAllWithEagerRelationships(pageable);
+        } else {
+            page = medicationService.findAll(pageable);
+        }
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
-    }
-
-    /**
-     * {@code GET  /medications/count} : count all the medications.
-     *
-     * @param criteria the criteria which the requested entities should match.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the count in body.
-     */
-    @GetMapping("/count")
-    public ResponseEntity<Long> countMedications(MedicationCriteria criteria) {
-        LOG.debug("REST request to count Medications by criteria: {}", criteria);
-        return ResponseEntity.ok().body(medicationQueryService.countByCriteria(criteria));
     }
 
     /**

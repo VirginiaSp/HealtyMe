@@ -1,7 +1,9 @@
 package com.mycompany.myapp.service.dto;
 
+import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -15,16 +17,30 @@ public class MedicationDTO implements Serializable {
     private Long id;
 
     @NotNull
+    @Size(max = 100)
     private String name;
 
-    @Min(value = 0)
+    @NotNull
+    @Min(value = 1)
     @Max(value = 10)
     private Integer rating;
 
-    @Size(max = 1000)
+    @Lob
     private String notes;
 
-    @NotNull
+    @Size(max = 200)
+    private String dosage;
+
+    @Size(max = 100)
+    private String frequency;
+
+    @Size(max = 500)
+    private String sideEffects;
+
+    private LocalDate createdDate;
+
+    private LocalDate lastTaken;
+
     private UserDTO owner;
 
     private Set<MedicationCategoryDTO> categories = new HashSet<>();
@@ -59,6 +75,46 @@ public class MedicationDTO implements Serializable {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getDosage() {
+        return dosage;
+    }
+
+    public void setDosage(String dosage) {
+        this.dosage = dosage;
+    }
+
+    public String getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+
+    public String getSideEffects() {
+        return sideEffects;
+    }
+
+    public void setSideEffects(String sideEffects) {
+        this.sideEffects = sideEffects;
+    }
+
+    public LocalDate getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public LocalDate getLastTaken() {
+        return lastTaken;
+    }
+
+    public void setLastTaken(LocalDate lastTaken) {
+        this.lastTaken = lastTaken;
     }
 
     public UserDTO getOwner() {
@@ -106,6 +162,11 @@ public class MedicationDTO implements Serializable {
             ", name='" + getName() + "'" +
             ", rating=" + getRating() +
             ", notes='" + getNotes() + "'" +
+            ", dosage='" + getDosage() + "'" +
+            ", frequency='" + getFrequency() + "'" +
+            ", sideEffects='" + getSideEffects() + "'" +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", lastTaken='" + getLastTaken() + "'" +
             ", owner=" + getOwner() +
             ", categories=" + getCategories() +
             "}";

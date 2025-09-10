@@ -2,6 +2,7 @@ package com.mycompany.myapp.service.dto;
 
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -15,13 +16,21 @@ public class MedicationCategoryDTO implements Serializable {
     private Long id;
 
     @NotNull
+    @Size(max = 50)
     private String name;
 
-    @Size(max = 500)
+    @Size(max = 200)
     private String description;
 
-    @NotNull
-    private UserDTO owner;
+    @Size(max = 7)
+    private String color;
+
+    @Size(max = 50)
+    private String icon;
+
+    private LocalDate createdDate;
+
+    private UserDTO createdBy;
 
     private Set<MedicationDTO> medications = new HashSet<>();
 
@@ -49,12 +58,36 @@ public class MedicationCategoryDTO implements Serializable {
         this.description = description;
     }
 
-    public UserDTO getOwner() {
-        return owner;
+    public String getColor() {
+        return color;
     }
 
-    public void setOwner(UserDTO owner) {
-        this.owner = owner;
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public LocalDate getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public UserDTO getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UserDTO createdBy) {
+        this.createdBy = createdBy;
     }
 
     public Set<MedicationDTO> getMedications() {
@@ -93,7 +126,10 @@ public class MedicationCategoryDTO implements Serializable {
             "id=" + getId() +
             ", name='" + getName() + "'" +
             ", description='" + getDescription() + "'" +
-            ", owner=" + getOwner() +
+            ", color='" + getColor() + "'" +
+            ", icon='" + getIcon() + "'" +
+            ", createdDate='" + getCreatedDate() + "'" +
+            ", createdBy=" + getCreatedBy() +
             ", medications=" + getMedications() +
             "}";
     }

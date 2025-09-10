@@ -20,7 +20,10 @@
       "id": "ID",
       "name": "Name",
       "description": "Description",
-      "owner": "Owner",
+      "color": "Color",
+      "icon": "Icon",
+      "createdDate": "Created Date",
+      "createdBy": "Created By",
       "medications": "Medications"
     }
   }

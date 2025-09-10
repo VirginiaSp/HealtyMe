@@ -8,28 +8,45 @@
     {
       "fieldName": "name",
       "fieldType": "String",
-      "fieldValidateRules": ["required", "unique"]
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "50"
     },
     {
       "fieldName": "description",
       "fieldType": "String",
       "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "500"
+      "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "color",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "7"
+    },
+    {
+      "fieldName": "icon",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "createdDate",
+      "fieldType": "LocalDate"
     }
   ],
-  "jpaMetamodelFiltering": true,
   "name": "MedicationCategory",
+  "pagination": "pagination",
   "relationships": [
     {
       "otherEntityField": "login",
       "otherEntityName": "user",
-      "relationshipName": "owner",
+      "relationshipName": "createdBy",
       "relationshipSide": "left",
       "relationshipType": "many-to-one",
-      "relationshipValidateRules": "required",
       "relationshipWithBuiltInEntity": true
     },
     {
+      "otherEntityField": "name",
       "otherEntityName": "medication",
       "otherEntityRelationshipName": "categories",
       "relationshipName": "medications",
@@ -38,5 +55,5 @@
     }
   ],
   "searchEngine": "no",
-  "service": "serviceClass"
+  "service": "serviceImpl"
 }

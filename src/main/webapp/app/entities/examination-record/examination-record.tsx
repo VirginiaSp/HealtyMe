@@ -12,8 +12,7 @@ const isImage = (ct?: string) => !!ct && /^image\//i.test(ct);
 const getRec = (rec: IExaminationRecord) => {
   const anyRec = rec as any;
   const category = anyRec.category ?? anyRec.examinationCategory ?? anyRec.examCategory;
-  // FIXED: Only show "Uncategorized" for grouping, not as default display
-  const categoryName = category?.name ?? anyRec.examinationCategoryName ?? '';
+  const categoryName = category?.name ?? anyRec.examinationCategoryName ?? 'Uncategorized';
   const date = anyRec.examDate ?? anyRec.date ?? anyRec.examinationDate ?? anyRec.createdDate ?? rec['createdDate'];
   const fileCt =
     anyRec.fileContentType ?? anyRec.attachmentContentType ?? anyRec.documentContentType ?? anyRec.binaryContentType ?? anyRec.contentType;
@@ -52,10 +51,8 @@ export const ExaminationRecord = () => {
     const map: Record<string, IExaminationRecord[]> = {};
     (examinationRecordList ?? []).forEach(rec => {
       const { categoryName } = getRec(rec);
-      // FIXED: Use "Uncategorized" only for grouping records without categories
-      const groupKey = categoryName || 'Uncategorized';
-      if (!map[groupKey]) map[groupKey] = [];
-      map[groupKey].push(rec);
+      if (!map[categoryName]) map[categoryName] = [];
+      map[categoryName].push(rec);
     });
     return map;
   }, [examinationRecordList]);
@@ -113,7 +110,7 @@ export const ExaminationRecord = () => {
           return (
             <React.Fragment key={rec.id}>
               <tr onClick={() => setOpenRowId(openRowId === rec.id ? undefined : rec.id)} style={{ cursor: 'pointer' }}>
-                <td>{categoryName || 'No Category'}</td>
+                <td>{categoryName}</td>
                 <td>{formatDateOnly(date)}</td>
                 <td>
                   {fileData ? (

@@ -8,23 +8,47 @@
     {
       "fieldName": "name",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "maxlength"],
+      "fieldValidateRulesMaxlength": "100"
     },
     {
       "fieldName": "rating",
       "fieldType": "Integer",
-      "fieldValidateRules": ["min", "max"],
+      "fieldValidateRules": ["min", "max", "required"],
       "fieldValidateRulesMax": "10",
-      "fieldValidateRulesMin": "0"
+      "fieldValidateRulesMin": "1"
     },
     {
       "fieldName": "notes",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "dosage",
       "fieldType": "String",
       "fieldValidateRules": ["maxlength"],
-      "fieldValidateRulesMaxlength": "1000"
+      "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "frequency",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "sideEffects",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    },
+    {
+      "fieldName": "createdDate",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "lastTaken",
+      "fieldType": "LocalDate"
     }
   ],
-  "jpaMetamodelFiltering": true,
   "name": "Medication",
   "pagination": "pagination",
   "relationships": [
@@ -34,10 +58,10 @@
       "relationshipName": "owner",
       "relationshipSide": "left",
       "relationshipType": "many-to-one",
-      "relationshipValidateRules": "required",
       "relationshipWithBuiltInEntity": true
     },
     {
+      "otherEntityField": "name",
       "otherEntityName": "medicationCategory",
       "otherEntityRelationshipName": "medications",
       "relationshipName": "categories",
@@ -46,5 +70,5 @@
     }
   ],
   "searchEngine": "no",
-  "service": "serviceClass"
+  "service": "serviceImpl"
 }

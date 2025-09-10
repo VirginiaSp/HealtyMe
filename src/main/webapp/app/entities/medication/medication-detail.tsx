@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button, Col, Row } from 'reactstrap';
-import { Translate } from 'react-jhipster';
+import { TextFormat, Translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import { APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntity } from './medication.reducer';
@@ -50,6 +51,44 @@ export const MedicationDetail = () => {
           </dt>
           <dd>{medicationEntity.notes}</dd>
           <dt>
+            <span id="dosage">
+              <Translate contentKey="healthyMeApp.medication.dosage">Dosage</Translate>
+            </span>
+          </dt>
+          <dd>{medicationEntity.dosage}</dd>
+          <dt>
+            <span id="frequency">
+              <Translate contentKey="healthyMeApp.medication.frequency">Frequency</Translate>
+            </span>
+          </dt>
+          <dd>{medicationEntity.frequency}</dd>
+          <dt>
+            <span id="sideEffects">
+              <Translate contentKey="healthyMeApp.medication.sideEffects">Side Effects</Translate>
+            </span>
+          </dt>
+          <dd>{medicationEntity.sideEffects}</dd>
+          <dt>
+            <span id="createdDate">
+              <Translate contentKey="healthyMeApp.medication.createdDate">Created Date</Translate>
+            </span>
+          </dt>
+          <dd>
+            {medicationEntity.createdDate ? (
+              <TextFormat value={medicationEntity.createdDate} type="date" format={APP_LOCAL_DATE_FORMAT} />
+            ) : null}
+          </dd>
+          <dt>
+            <span id="lastTaken">
+              <Translate contentKey="healthyMeApp.medication.lastTaken">Last Taken</Translate>
+            </span>
+          </dt>
+          <dd>
+            {medicationEntity.lastTaken ? (
+              <TextFormat value={medicationEntity.lastTaken} type="date" format={APP_LOCAL_DATE_FORMAT} />
+            ) : null}
+          </dd>
+          <dt>
             <Translate contentKey="healthyMeApp.medication.owner">Owner</Translate>
           </dt>
           <dd>{medicationEntity.owner ? medicationEntity.owner.login : ''}</dd>
@@ -60,7 +99,7 @@ export const MedicationDetail = () => {
             {medicationEntity.categories
               ? medicationEntity.categories.map((val, i) => (
                   <span key={val.id}>
-                    <a>{val.id}</a>
+                    <a>{val.name}</a>
                     {medicationEntity.categories && i === medicationEntity.categories.length - 1 ? '' : ', '}
                   </span>
                 ))

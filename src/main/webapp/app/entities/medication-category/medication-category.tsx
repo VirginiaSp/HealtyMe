@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { Translate, getSortState } from 'react-jhipster';
+import { JhiItemCount, JhiPagination, TextFormat, Translate, getPaginationState } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
-import { ASC, DESC } from 'app/shared/util/pagination.constants';
-import { overrideSortStateWithQueryParams } from 'app/shared/util/entity-utils';
+import { APP_LOCAL_DATE_FORMAT } from 'app/config/constants';
+import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
+import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import { getEntities } from './medication-category.reducer';
@@ -16,22 +17,27 @@ export const MedicationCategory = () => {
   const pageLocation = useLocation();
   const navigate = useNavigate();
 
-  const [sortState, setSortState] = useState(overrideSortStateWithQueryParams(getSortState(pageLocation, 'id'), pageLocation.search));
+  const [paginationState, setPaginationState] = useState(
+    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
+  );
 
   const medicationCategoryList = useAppSelector(state => state.medicationCategory.entities);
   const loading = useAppSelector(state => state.medicationCategory.loading);
+  const totalItems = useAppSelector(state => state.medicationCategory.totalItems);
 
   const getAllEntities = () => {
     dispatch(
       getEntities({
-        sort: `${sortState.sort},${sortState.order}`,
+        page: paginationState.activePage - 1,
+        size: paginationState.itemsPerPage,
+        sort: `${paginationState.sort},${paginationState.order}`,
       }),
     );
   };
 
   const sortEntities = () => {
     getAllEntities();
-    const endURL = `?sort=${sortState.sort},${sortState.order}`;
+    const endURL = `?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`;
     if (pageLocation.search !== endURL) {
       navigate(`${pageLocation.pathname}${endURL}`);
     }
@@ -39,23 +45,44 @@ export const MedicationCategory = () => {
 
   useEffect(() => {
     sortEntities();
-  }, [sortState.order, sortState.sort]);
+  }, [paginationState.activePage, paginationState.order, paginationState.sort]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(pageLocation.search);
+    const page = params.get('page');
+    const sort = params.get(SORT);
+    if (page && sort) {
+      const sortSplit = sort.split(',');
+      setPaginationState({
+        ...paginationState,
+        activePage: +page,
+        sort: sortSplit[0],
+        order: sortSplit[1],
+      });
+    }
+  }, [pageLocation.search]);
 
   const sort = p => () => {
-    setSortState({
-      ...sortState,
-      order: sortState.order === ASC ? DESC : ASC,
+    setPaginationState({
+      ...paginationState,
+      order: paginationState.order === ASC ? DESC : ASC,
       sort: p,
     });
   };
+
+  const handlePagination = currentPage =>
+    setPaginationState({
+      ...paginationState,
+      activePage: currentPage,
+    });
 
   const handleSyncList = () => {
     sortEntities();
   };
 
   const getSortIconByFieldName = (fieldName: string) => {
-    const sortFieldName = sortState.sort;
-    const order = sortState.order;
+    const sortFieldName = paginationState.sort;
+    const order = paginationState.order;
     if (sortFieldName !== fieldName) {
       return faSort;
     }
@@ -100,12 +127,20 @@ export const MedicationCategory = () => {
                   <Translate contentKey="healthyMeApp.medicationCategory.description">Description</Translate>{' '}
                   <FontAwesomeIcon icon={getSortIconByFieldName('description')} />
                 </th>
-                <th>
-                  <Translate contentKey="healthyMeApp.medicationCategory.owner">Owner</Translate> <FontAwesomeIcon icon="sort" />
+                <th className="hand" onClick={sort('color')}>
+                  <Translate contentKey="healthyMeApp.medicationCategory.color">Color</Translate>{' '}
+                  <FontAwesomeIcon icon={getSortIconByFieldName('color')} />
+                </th>
+                <th className="hand" onClick={sort('icon')}>
+                  <Translate contentKey="healthyMeApp.medicationCategory.icon">Icon</Translate>{' '}
+                  <FontAwesomeIcon icon={getSortIconByFieldName('icon')} />
+                </th>
+                <th className="hand" onClick={sort('createdDate')}>
+                  <Translate contentKey="healthyMeApp.medicationCategory.createdDate">Created Date</Translate>{' '}
+                  <FontAwesomeIcon icon={getSortIconByFieldName('createdDate')} />
                 </th>
                 <th>
-                  <Translate contentKey="healthyMeApp.medicationCategory.medications">Medications</Translate>{' '}
-                  <FontAwesomeIcon icon="sort" />
+                  <Translate contentKey="healthyMeApp.medicationCategory.createdBy">Created By</Translate> <FontAwesomeIcon icon="sort" />
                 </th>
                 <th />
               </tr>
@@ -120,17 +155,14 @@ export const MedicationCategory = () => {
                   </td>
                   <td>{medicationCategory.name}</td>
                   <td>{medicationCategory.description}</td>
-                  <td>{medicationCategory.owner ? medicationCategory.owner.login : ''}</td>
+                  <td>{medicationCategory.color}</td>
+                  <td>{medicationCategory.icon}</td>
                   <td>
-                    {medicationCategory.medications
-                      ? medicationCategory.medications.map((val, j) => (
-                          <span key={j}>
-                            <Link to={`/medication/${val.id}`}>{val.id}</Link>
-                            {j === medicationCategory.medications.length - 1 ? '' : ', '}
-                          </span>
-                        ))
-                      : null}
+                    {medicationCategory.createdDate ? (
+                      <TextFormat type="date" value={medicationCategory.createdDate} format={APP_LOCAL_DATE_FORMAT} />
+                    ) : null}
                   </td>
+                  <td>{medicationCategory.createdBy ? medicationCategory.createdBy.login : ''}</td>
                   <td className="text-end">
                     <div className="btn-group flex-btn-group-container">
                       <Button
@@ -147,7 +179,7 @@ export const MedicationCategory = () => {
                       </Button>
                       <Button
                         tag={Link}
-                        to={`/medication-category/${medicationCategory.id}/edit`}
+                        to={`/medication-category/${medicationCategory.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
                         color="primary"
                         size="sm"
                         data-cy="entityEditButton"
@@ -158,7 +190,9 @@ export const MedicationCategory = () => {
                         </span>
                       </Button>
                       <Button
-                        onClick={() => (window.location.href = `/medication-category/${medicationCategory.id}/delete`)}
+                        onClick={() =>
+                          (window.location.href = `/medication-category/${medicationCategory.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
+                        }
                         color="danger"
                         size="sm"
                         data-cy="entityDeleteButton"
@@ -182,6 +216,24 @@ export const MedicationCategory = () => {
           )
         )}
       </div>
+      {totalItems ? (
+        <div className={medicationCategoryList && medicationCategoryList.length > 0 ? '' : 'd-none'}>
+          <div className="justify-content-center d-flex">
+            <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} i18nEnabled />
+          </div>
+          <div className="justify-content-center d-flex">
+            <JhiPagination
+              activePage={paginationState.activePage}
+              onSelect={handlePagination}
+              maxButtons={5}
+              itemsPerPage={paginationState.itemsPerPage}
+              totalItems={totalItems}
+            />
+          </div>
+        </div>
+      ) : (
+        ''
+      )}
     </div>
   );
 };

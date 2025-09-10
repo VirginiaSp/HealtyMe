@@ -49,7 +49,12 @@ public class MedicationAsserts {
             .as("Verify Medication relevant properties")
             .satisfies(a -> assertThat(a.getName()).as("check name").isEqualTo(expected.getName()))
             .satisfies(a -> assertThat(a.getRating()).as("check rating").isEqualTo(expected.getRating()))
-            .satisfies(a -> assertThat(a.getNotes()).as("check notes").isEqualTo(expected.getNotes()));
+            .satisfies(a -> assertThat(a.getNotes()).as("check notes").isEqualTo(expected.getNotes()))
+            .satisfies(a -> assertThat(a.getDosage()).as("check dosage").isEqualTo(expected.getDosage()))
+            .satisfies(a -> assertThat(a.getFrequency()).as("check frequency").isEqualTo(expected.getFrequency()))
+            .satisfies(a -> assertThat(a.getSideEffects()).as("check sideEffects").isEqualTo(expected.getSideEffects()))
+            .satisfies(a -> assertThat(a.getCreatedDate()).as("check createdDate").isEqualTo(expected.getCreatedDate()))
+            .satisfies(a -> assertThat(a.getLastTaken()).as("check lastTaken").isEqualTo(expected.getLastTaken()));
     }
 
     /**
