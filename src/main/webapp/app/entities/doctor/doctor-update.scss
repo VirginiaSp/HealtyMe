@@ -1,0 +1,239 @@
+.modern-doctor-form {
+  max-width: 800px;
+  margin: 20px auto;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  .form-header {
+    background: #5cb3a8;
+    color: white;
+    padding: 30px;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>');
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .header-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-subtitle {
+      opacity: 0.9;
+      font-size: 16px;
+      margin: 0;
+    }
+  }
+
+  .form-content {
+    padding: 40px;
+  }
+
+  .required-note {
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    color: #92400e;
+    font-size: 14px;
+  }
+
+  .custom-field {
+    margin-bottom: 24px;
+
+    .field-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .field-icon {
+        width: 16px;
+        height: 16px;
+        opacity: 0.6;
+      }
+
+      .required-indicator {
+        color: #ef4444;
+        font-weight: bold;
+      }
+    }
+
+    .custom-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      background: #fafafa;
+
+      &:focus {
+        outline: none;
+        border-color: #5cb3a8;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(92, 179, 168, 0.1);
+      }
+
+      &.custom-textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+    }
+
+    .multi-field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+
+      .field-with-remove {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .custom-input {
+          flex: 1;
+        }
+
+        .remove-btn {
+          background: #fee2e2;
+          border: none;
+          color: #dc2626;
+          padding: 8px;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          &:hover {
+            background: #fecaca;
+          }
+        }
+      }
+    }
+
+    .add-more-btn {
+      background: #f3f4f6;
+      border: 2px dashed #d1d5db;
+      color: #6b7280;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+
+      &:hover {
+        background: #e5e7eb;
+        border-color: #5cb3a8;
+        color: #5cb3a8;
+      }
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    padding: 30px 40px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+
+    .btn-modern {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+
+      &.btn-secondary {
+        background: #f3f4f6;
+        color: #6b7280;
+
+        &:hover {
+          background: #e5e7eb;
+          transform: translateY(-1px);
+          color: #6b7280;
+          text-decoration: none;
+        }
+      }
+
+      &.btn-primary {
+        background: #5cb3a8;
+        color: white;
+
+        &:hover {
+          background: #4a9d94;
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(92, 179, 168, 0.3);
+          color: white;
+          text-decoration: none;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    margin: 10px;
+    border-radius: 12px;
+
+    .form-header,
+    .form-content {
+      padding: 20px;
+    }
+
+    .form-actions {
+      padding: 20px;
+      flex-direction: column;
+
+      .btn-modern {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}

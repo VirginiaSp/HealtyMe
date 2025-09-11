@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Col, Row, Table, ButtonGroup } from 'reactstrap';
-import { TextFormat } from 'react-jhipster';
+import { Button, Col, Row, ButtonGroup } from 'reactstrap';
 import { Translate } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities } from './examination-record.reducer';
 import { IExaminationRecord } from 'app/shared/model/examination-record.model';
+import './examination-record-list.scss';
 
 const isImage = (ct?: string) => !!ct && /^image\//i.test(ct);
 
@@ -19,18 +19,34 @@ const getRec = (rec: IExaminationRecord) => {
   const fileData = anyRec.file ?? anyRec.attachment ?? anyRec.document ?? anyRec.binary ?? anyRec.content;
   const filename = anyRec.originalFilename ?? anyRec.filename ?? anyRec.originalFileName ?? anyRec.name ?? 'exam';
   const notes = anyRec.notes ?? anyRec.note ?? anyRec.description ?? anyRec.comments ?? '';
-  return { categoryName, date, fileCt, fileData, filename, notes };
+  const title = anyRec.title ?? filename ?? 'Examination Record';
+  return { categoryName, date, fileCt, fileData, filename, notes, title };
 };
 
-// Custom date formatter - removes time and shows full year
 const formatDateOnly = (date: string | Date) => {
   if (!date) return null;
   const d = new Date(date);
-  return d.toLocaleDateString('en-GB', {
+  return d.toLocaleDateString('el-GR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   });
+};
+
+const getCategoryIcon = (categoryName: string) => {
+  if (categoryName.includes('Αιματολογικές') || categoryName.includes('αίμα')) return '🩸';
+  if (categoryName.includes('Καρδιολογικές') || categoryName.includes('καρδι')) return '❤️';
+  if (categoryName.includes('Απεικονιστικές') || categoryName.includes('ακτιν')) return '📷';
+  if (categoryName.includes('Γενικές')) return '🏥';
+  return '📋';
+};
+
+const getCategoryColor = (categoryName: string) => {
+  if (categoryName.includes('Αιματολογικές')) return '#e74c3c';
+  if (categoryName.includes('Καρδιολογικές')) return '#e91e63';
+  if (categoryName.includes('Απεικονιστικές')) return '#9c27b0';
+  if (categoryName.includes('Γενικές')) return '#2196f3';
+  return '#4a9b8f';
 };
 
 export const ExaminationRecord = () => {
@@ -39,7 +55,6 @@ export const ExaminationRecord = () => {
   const examinationRecordList = useAppSelector(state => state.examinationRecord.entities);
   const loading = useAppSelector(state => state.examinationRecord.loading);
 
-  const [openRowId, setOpenRowId] = useState<number | string | undefined>(undefined);
   const [viewMode, setViewMode] = useState<'timeline' | 'category'>('timeline');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -67,7 +82,6 @@ export const ExaminationRecord = () => {
 
   const handleFileClick = (fileCt: string, fileData: string, filename: string) => {
     if (isImage(fileCt)) {
-      // Open image in new window/tab for full view
       const newWindow = window.open();
       if (newWindow) {
         newWindow.document.write(`
@@ -80,7 +94,6 @@ export const ExaminationRecord = () => {
         `);
       }
     } else {
-      // Download non-image files
       const link = document.createElement('a');
       link.href = `data:${fileCt ?? 'application/octet-stream'};base64,${fileData}`;
       link.download = filename;
@@ -88,98 +101,95 @@ export const ExaminationRecord = () => {
     }
   };
 
-  const renderTimelineView = () => (
-    <Table responsive>
-      <thead>
-        <tr>
-          <th>
-            <Translate contentKey="healthyMeApp.examinationRecord.category">Category</Translate>
-          </th>
-          <th>
-            <Translate contentKey="healthyMeApp.examinationRecord.date">Date</Translate>
-          </th>
-          <th>
-            <Translate contentKey="healthyMeApp.examinationRecord.file">File</Translate>
-          </th>
-          <th />
-        </tr>
-      </thead>
-      <tbody>
-        {sortedRecords.map(rec => {
-          const { categoryName, date, fileCt, fileData, filename, notes } = getRec(rec);
-          return (
-            <React.Fragment key={rec.id}>
-              <tr onClick={() => setOpenRowId(openRowId === rec.id ? undefined : rec.id)} style={{ cursor: 'pointer' }}>
-                <td>{categoryName}</td>
-                <td>{formatDateOnly(date)}</td>
-                <td>
-                  {fileData ? (
-                    <div
-                      onClick={e => {
-                        e.stopPropagation();
-                        handleFileClick(fileCt, fileData, filename);
-                      }}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {isImage(fileCt) ? (
-                        <img
-                          src={`data:${fileCt};base64,${fileData}`}
-                          alt={filename}
-                          style={{ maxWidth: 120, maxHeight: 80, objectFit: 'cover', borderRadius: 6 }}
-                        />
-                      ) : (
-                        <Button color="link" size="sm">
-                          📎 {filename}
-                        </Button>
-                      )}
-                    </div>
-                  ) : (
-                    <span>-</span>
-                  )}
-                </td>
-                <td className="text-end">
-                  <div className="btn-group flex-btn-group-container">
-                    <Button tag={Link} to={`/examination-record/${rec.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                      <Translate contentKey="entity.action.view">View</Translate>
-                    </Button>
-                    <Button tag={Link} to={`/examination-record/${rec.id}/edit`} color="primary" size="sm" data-cy="entityEditButton">
-                      <Translate contentKey="entity.action.edit">Edit</Translate>
-                    </Button>
-                    <Button tag={Link} to={`/examination-record/${rec.id}/delete`} color="danger" size="sm" data-cy="entityDeleteButton">
-                      <Translate contentKey="entity.action.delete">Delete</Translate>
-                    </Button>
-                  </div>
-                </td>
-              </tr>
+  const renderExaminationCard = (rec: IExaminationRecord) => {
+    const { categoryName, date, fileCt, fileData, filename, notes, title } = getRec(rec);
+    const categoryColor = getCategoryColor(categoryName);
+    const categoryIcon = getCategoryIcon(categoryName);
 
-              {openRowId === rec.id && !!notes && (
-                <tr>
-                  <td colSpan={4}>
-                    <div className="p-3 bg-light rounded">{notes}</div>
-                  </td>
-                </tr>
+    return (
+      <div key={rec.id} className="examination-card">
+        <div className="examination-card-header">
+          <div className="category-info">
+            <span
+              className="category-badge"
+              style={{ backgroundColor: categoryColor + '20', color: categoryColor, borderColor: categoryColor }}
+            >
+              {categoryIcon} {categoryName}
+            </span>
+            <span className="examination-date">{formatDateOnly(date)}</span>
+          </div>
+        </div>
+
+        <div className="examination-card-body">
+          <h3 className="examination-title">{title}</h3>
+
+          {fileData && (
+            <div className="file-attachment" onClick={() => handleFileClick(fileCt, fileData, filename)}>
+              {isImage(fileCt) ? (
+                <div className="image-preview">
+                  <img src={`data:${fileCt};base64,${fileData}`} alt={filename} className="examination-image" />
+                  <div className="image-overlay">
+                    <span>🔍 Κάντε κλικ για μεγέθυνση</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="file-link">
+                  📎 <span>{filename}</span>
+                  <small>Κάντε κλικ για λήψη</small>
+                </div>
               )}
-            </React.Fragment>
-          );
-        })}
-      </tbody>
-    </Table>
+            </div>
+          )}
+
+          {notes && (
+            <div className="examination-notes">
+              <strong>Σημειώσεις:</strong>
+              <p>{notes}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="examination-card-actions">
+          <Button tag={Link} to={`/examination-record/${rec.id}`} color="info" size="sm" className="action-btn">
+            👁️ Προβολή
+          </Button>
+          <Button tag={Link} to={`/examination-record/${rec.id}/edit`} color="primary" size="sm" className="action-btn">
+            ✏️ Επεξεργασία
+          </Button>
+          <Button tag={Link} to={`/examination-record/${rec.id}/delete`} color="danger" size="sm" className="action-btn">
+            🗑️ Διαγραφή
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderTimelineView = () => (
+    <div className="examination-cards-container">{sortedRecords.map(rec => renderExaminationCard(rec))}</div>
   );
 
   const renderCategorySelection = () => (
-    <div className="mb-4">
-      <h4>Select a Category:</h4>
-      <div className="d-flex flex-wrap gap-2">
-        {Object.keys(grouped).map(categoryName => (
-          <Button
-            key={categoryName}
-            color={selectedCategory === categoryName ? 'primary' : 'outline-primary'}
-            onClick={() => setSelectedCategory(selectedCategory === categoryName ? null : categoryName)}
-            className="mb-2"
-          >
-            {categoryName} ({grouped[categoryName].length})
-          </Button>
-        ))}
+    <div className="category-filter-section">
+      <h4>Επιλογή Κατηγορίας:</h4>
+      <div className="category-filter-buttons">
+        {Object.keys(grouped).map(categoryName => {
+          const categoryColor = getCategoryColor(categoryName);
+          const categoryIcon = getCategoryIcon(categoryName);
+          return (
+            <Button
+              key={categoryName}
+              className={`category-filter-btn ${selectedCategory === categoryName ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(selectedCategory === categoryName ? null : categoryName)}
+              style={{
+                backgroundColor: selectedCategory === categoryName ? categoryColor : 'transparent',
+                borderColor: categoryColor,
+                color: selectedCategory === categoryName ? 'white' : categoryColor,
+              }}
+            >
+              {categoryIcon} {categoryName} ({grouped[categoryName].length})
+            </Button>
+          );
+        })}
       </div>
     </div>
   );
@@ -194,114 +204,37 @@ export const ExaminationRecord = () => {
     });
 
     return (
-      <div>
-        <h4 className="mb-3">{selectedCategory} Records</h4>
-        <Table responsive>
-          <thead>
-            <tr>
-              <th>
-                <Translate contentKey="healthyMeApp.examinationRecord.date">Date</Translate>
-              </th>
-              <th>
-                <Translate contentKey="healthyMeApp.examinationRecord.file">File</Translate>
-              </th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {categoryRecords.map(rec => {
-              const { date, fileCt, fileData, filename, notes } = getRec(rec);
-              return (
-                <React.Fragment key={rec.id}>
-                  <tr onClick={() => setOpenRowId(openRowId === rec.id ? undefined : (rec.id as any))} style={{ cursor: 'pointer' }}>
-                    <td>{formatDateOnly(date)}</td>
-                    <td>
-                      {fileData ? (
-                        <div
-                          onClick={e => {
-                            e.stopPropagation();
-                            handleFileClick(fileCt, fileData, filename);
-                          }}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          {isImage(fileCt) ? (
-                            <img
-                              src={`data:${fileCt};base64,${fileData}`}
-                              alt={filename}
-                              style={{ maxWidth: 120, maxHeight: 80, objectFit: 'cover', borderRadius: 6 }}
-                            />
-                          ) : (
-                            <Button color="link" size="sm">
-                              📎 {filename}
-                            </Button>
-                          )}
-                        </div>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </td>
-                    <td className="text-end">
-                      <div className="btn-group flex-btn-group-container">
-                        <Button tag={Link} to={`/examination-record/${rec.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                          <Translate contentKey="entity.action.view">View</Translate>
-                        </Button>
-                        <Button tag={Link} to={`/examination-record/${rec.id}/edit`} color="primary" size="sm" data-cy="entityEditButton">
-                          <Translate contentKey="entity.action.edit">Edit</Translate>
-                        </Button>
-                        <Button
-                          tag={Link}
-                          to={`/examination-record/${rec.id}/delete`}
-                          color="danger"
-                          size="sm"
-                          data-cy="entityDeleteButton"
-                        >
-                          <Translate contentKey="entity.action.delete">Delete</Translate>
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  {openRowId === rec.id && !!notes && (
-                    <tr>
-                      <td colSpan={3}>
-                        <div className="p-3 bg-light rounded">{notes}</div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </tbody>
-        </Table>
+      <div className="category-records-section">
+        <h4 className="category-title">
+          {getCategoryIcon(selectedCategory)} {selectedCategory} - Αποτελέσματα
+        </h4>
+        <div className="examination-cards-container">{categoryRecords.map(rec => renderExaminationCard(rec))}</div>
       </div>
     );
   };
 
   return (
-    <div>
-      <h2 id="examination-record-heading" data-cy="ExaminationRecordHeading">
-        <Translate contentKey="healthyMeApp.examinationRecord.home.title">Examination Records</Translate>
-        <div className="d-flex justify-content-end">
-          <Link to="/examination-record/new" className="btn btn-primary jh-create-entity" id="jh-create-entity">
-            <Translate contentKey="healthyMeApp.examinationRecord.home.createLabel">Create new Examination Record</Translate>
-          </Link>
-        </div>
-      </h2>
+    <div className="examination-record-page">
+      <div className="page-header">
+        <h2 className="page-title">Ιστορικό Εξετάσεων</h2>
+        <Link to="/examination-record/new" className="create-btn">
+          ➕ Νέα Εξέταση
+        </Link>
+      </div>
 
-      {/* View Mode Toggle */}
-      <div className="mb-4">
+      <div className="view-controls">
         <ButtonGroup>
           <Button
-            color={viewMode === 'timeline' ? 'primary' : 'outline-primary'}
+            className={`view-toggle ${viewMode === 'timeline' ? 'active' : ''}`}
             onClick={() => {
               setViewMode('timeline');
               setSelectedCategory(null);
             }}
           >
-            Timeline View
+            📅 Χρονολογική Προβολή
           </Button>
-          <Button color={viewMode === 'category' ? 'primary' : 'outline-primary'} onClick={() => setViewMode('category')}>
-            Category View
+          <Button className={`view-toggle ${viewMode === 'category' ? 'active' : ''}`} onClick={() => setViewMode('category')}>
+            📂 Προβολή ανά Κατηγορία
           </Button>
         </ButtonGroup>
       </div>
@@ -310,8 +243,13 @@ export const ExaminationRecord = () => {
         <Col md="12">
           {Object.keys(grouped).length === 0 ? (
             !loading && (
-              <div className="alert alert-warning">
-                <Translate contentKey="healthyMeApp.examinationRecord.home.notFound">No Examination Records found</Translate>
+              <div className="empty-state">
+                <div className="empty-icon">📋</div>
+                <h3>Δεν βρέθηκαν εξετάσεις</h3>
+                <p>Προσθέστε την πρώτη σας εξέταση για να ξεκινήσετε</p>
+                <Link to="/examination-record/new" className="create-btn">
+                  ➕ Νέα Εξέταση
+                </Link>
               </div>
             )
           ) : (

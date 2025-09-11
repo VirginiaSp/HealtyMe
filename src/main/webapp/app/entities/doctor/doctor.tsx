@@ -1,229 +1,238 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Button, Table } from 'reactstrap';
-import { JhiItemCount, JhiPagination, Translate, getPaginationState } from 'react-jhipster';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
-import { ASC, DESC, ITEMS_PER_PAGE, SORT } from 'app/shared/util/pagination.constants';
-import { overridePaginationStateWithQueryParams } from 'app/shared/util/entity-utils';
+import { Link } from 'react-router-dom';
+import { Button, Row, Col, Input } from 'reactstrap';
+import { Translate } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
-
 import { getEntities } from './doctor.reducer';
+import { IDoctor } from 'app/shared/model/doctor.model';
+import './doctors-phonebook.scss';
 
-export const Doctor = () => {
+const getSpecialtyColor = (specialty: string) => {
+  const specialtyLower = specialty?.toLowerCase() || '';
+  if (specialtyLower.includes('καρδιολογ') || specialtyLower.includes('cardio')) return '#e91e63';
+  if (specialtyLower.includes('παθολογ') || specialtyLower.includes('pathol')) return '#2196f3';
+  if (specialtyLower.includes('χειρουργ') || specialtyLower.includes('surg')) return '#f44336';
+  if (specialtyLower.includes('γυναικολογ') || specialtyLower.includes('gynec')) return '#9c27b0';
+  if (specialtyLower.includes('παιδιατρ') || specialtyLower.includes('pediatr')) return '#ff9800';
+  if (specialtyLower.includes('οφθαλμ') || specialtyLower.includes('ophthal')) return '#009688';
+  if (specialtyLower.includes('δερματολογ') || specialtyLower.includes('dermat')) return '#795548';
+  if (specialtyLower.includes('ψυχιατρ') || specialtyLower.includes('psychiatr')) return '#673ab7';
+  if (specialtyLower.includes('ουρολογ') || specialtyLower.includes('urol')) return '#607d8b';
+  if (specialtyLower.includes('ορθοπεδ') || specialtyLower.includes('orthop')) return '#ff5722';
+  return '#4a9b8f';
+};
+
+const getSpecialtyIcon = (specialty: string) => {
+  const specialtyLower = specialty?.toLowerCase() || '';
+  if (specialtyLower.includes('καρδιολογ') || specialtyLower.includes('cardio')) return '❤️';
+  if (specialtyLower.includes('παθολογ') || specialtyLower.includes('pathol')) return '🩺';
+  if (specialtyLower.includes('χειρουργ') || specialtyLower.includes('surg')) return '🔪';
+  if (specialtyLower.includes('γυναικολογ') || specialtyLower.includes('gynec')) return '👩‍⚕️';
+  if (specialtyLower.includes('παιδιατρ') || specialtyLower.includes('pediatr')) return '👶';
+  if (specialtyLower.includes('οφθαλμ') || specialtyLower.includes('ophthal')) return '👁️';
+  if (specialtyLower.includes('δερματολογ') || specialtyLower.includes('dermat')) return '🧴';
+  if (specialtyLower.includes('ψυχιατρ') || specialtyLower.includes('psychiatr')) return '🧠';
+  if (specialtyLower.includes('ουρολογ') || specialtyLower.includes('urol')) return '🫘';
+  if (specialtyLower.includes('ορθοπεδ') || specialtyLower.includes('orthop')) return '🦴';
+  return '👨‍⚕️';
+};
+
+const formatPhoneNumber = (phone: string) => {
+  if (!phone) return '';
+  // Basic phone formatting - can be enhanced based on locale
+  return phone.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+};
+
+export const DoctorsPhonebook = () => {
   const dispatch = useAppDispatch();
-
-  const pageLocation = useLocation();
-  const navigate = useNavigate();
-
-  const [paginationState, setPaginationState] = useState(
-    overridePaginationStateWithQueryParams(getPaginationState(pageLocation, ITEMS_PER_PAGE, 'id'), pageLocation.search),
-  );
 
   const doctorList = useAppSelector(state => state.doctor.entities);
   const loading = useAppSelector(state => state.doctor.loading);
-  const totalItems = useAppSelector(state => state.doctor.totalItems);
 
-  const getAllEntities = () => {
-    dispatch(
-      getEntities({
-        page: paginationState.activePage - 1,
-        size: paginationState.itemsPerPage,
-        sort: `${paginationState.sort},${paginationState.order}`,
-      }),
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string | null>(null);
+
+  useEffect(() => {
+    dispatch(getEntities({}));
+  }, [dispatch]);
+
+  const filteredDoctors = doctorList.filter(doctor => {
+    const matchesSearch =
+      doctor.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.specialty?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.phone?.includes(searchTerm);
+
+    const matchesSpecialty = !selectedSpecialty || doctor.specialty === selectedSpecialty;
+
+    return matchesSearch && matchesSpecialty;
+  });
+
+  const uniqueSpecialties = [...new Set(doctorList.map(doctor => doctor.specialty).filter(Boolean))] as string[];
+
+  const handleCall = (phone: string) => {
+    if (phone) {
+      window.location.href = `tel:${phone}`;
+    }
+  };
+
+  const renderDoctorCard = (doctor: IDoctor) => {
+    const specialtyColor = getSpecialtyColor(doctor.specialty || '');
+    const specialtyIcon = getSpecialtyIcon(doctor.specialty || '');
+
+    return (
+      <div key={doctor.id} className="doctor-card">
+        <div className="doctor-card-header">
+          <div className="doctor-avatar">
+            <span className="avatar-initials">{(doctor.firstName?.[0] || '') + (doctor.lastName?.[0] || '')}</span>
+          </div>
+          <div className="doctor-info">
+            <h3 className="doctor-name">
+              Δρ. {doctor.firstName} {doctor.lastName}
+            </h3>
+            <span
+              className="specialty-badge"
+              style={{
+                backgroundColor: specialtyColor + '20',
+                color: specialtyColor,
+                borderColor: specialtyColor,
+              }}
+            >
+              {specialtyIcon} {doctor.specialty}
+            </span>
+          </div>
+        </div>
+
+        <div className="doctor-card-body">
+          {doctor.phone && (
+            <div className="contact-item">
+              <div className="contact-icon">📞</div>
+              <div className="contact-details">
+                <label>Τηλέφωνο</label>
+                <span className="phone-number" onClick={() => handleCall(doctor.phone)}>
+                  {formatPhoneNumber(doctor.phone)}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {doctor.address && (
+            <div className="contact-item">
+              <div className="contact-icon">📍</div>
+              <div className="contact-details">
+                <label>Διεύθυνση</label>
+                <span>{doctor.address}</span>
+              </div>
+            </div>
+          )}
+
+          {doctor.notes && (
+            <div className="doctor-notes">
+              <label>Σημειώσεις</label>
+              <p>{doctor.notes}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="doctor-card-actions">
+          <Button className="action-btn call-btn" onClick={() => handleCall(doctor.phone)} disabled={!doctor.phone}>
+            📞 Κλήση
+          </Button>
+          <Button tag={Link} to={`/doctor/${doctor.id}`} className="action-btn view-btn">
+            👁️ Προβολή
+          </Button>
+          <Button tag={Link} to={`/doctor/${doctor.id}/edit`} className="action-btn edit-btn">
+            ✏️ Επεξεργασία
+          </Button>
+          <Button tag={Link} to={`/doctor/${doctor.id}/delete`} className="action-btn delete-btn">
+            🗑️ Διαγραφή
+          </Button>
+        </div>
+      </div>
     );
   };
 
-  const sortEntities = () => {
-    getAllEntities();
-    const endURL = `?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`;
-    if (pageLocation.search !== endURL) {
-      navigate(`${pageLocation.pathname}${endURL}`);
-    }
-  };
-
-  useEffect(() => {
-    sortEntities();
-  }, [paginationState.activePage, paginationState.order, paginationState.sort]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(pageLocation.search);
-    const page = params.get('page');
-    const sort = params.get(SORT);
-    if (page && sort) {
-      const sortSplit = sort.split(',');
-      setPaginationState({
-        ...paginationState,
-        activePage: +page,
-        sort: sortSplit[0],
-        order: sortSplit[1],
-      });
-    }
-  }, [pageLocation.search]);
-
-  const sort = p => () => {
-    setPaginationState({
-      ...paginationState,
-      order: paginationState.order === ASC ? DESC : ASC,
-      sort: p,
-    });
-  };
-
-  const handlePagination = currentPage =>
-    setPaginationState({
-      ...paginationState,
-      activePage: currentPage,
-    });
-
-  const handleSyncList = () => {
-    sortEntities();
-  };
-
-  const getSortIconByFieldName = (fieldName: string) => {
-    const sortFieldName = paginationState.sort;
-    const order = paginationState.order;
-    if (sortFieldName !== fieldName) {
-      return faSort;
-    }
-    return order === ASC ? faSortUp : faSortDown;
-  };
-
   return (
-    <div>
-      <h2 id="doctor-heading" data-cy="DoctorHeading">
-        <Translate contentKey="healthyMeApp.doctor.home.title">Doctors</Translate>
-        <div className="d-flex justify-content-end">
-          <Button className="me-2" color="info" onClick={handleSyncList} disabled={loading}>
-            <FontAwesomeIcon icon="sync" spin={loading} />{' '}
-            <Translate contentKey="healthyMeApp.doctor.home.refreshListLabel">Refresh List</Translate>
-          </Button>
-          <Link to="/doctor/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
-            <FontAwesomeIcon icon="plus" />
-            &nbsp;
-            <Translate contentKey="healthyMeApp.doctor.home.createLabel">Create new Doctor</Translate>
-          </Link>
-        </div>
-      </h2>
-      <div className="table-responsive">
-        {doctorList && doctorList.length > 0 ? (
-          <Table responsive>
-            <thead>
-              <tr>
-                <th className="hand" onClick={sort('id')}>
-                  <Translate contentKey="healthyMeApp.doctor.id">ID</Translate> <FontAwesomeIcon icon={getSortIconByFieldName('id')} />
-                </th>
-                <th className="hand" onClick={sort('firstName')}>
-                  <Translate contentKey="healthyMeApp.doctor.firstName">First Name</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('firstName')} />
-                </th>
-                <th className="hand" onClick={sort('lastName')}>
-                  <Translate contentKey="healthyMeApp.doctor.lastName">Last Name</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('lastName')} />
-                </th>
-                <th className="hand" onClick={sort('specialty')}>
-                  <Translate contentKey="healthyMeApp.doctor.specialty">Specialty</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('specialty')} />
-                </th>
-                <th className="hand" onClick={sort('phone')}>
-                  <Translate contentKey="healthyMeApp.doctor.phone">Phone</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('phone')} />
-                </th>
-                <th className="hand" onClick={sort('address')}>
-                  <Translate contentKey="healthyMeApp.doctor.address">Address</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('address')} />
-                </th>
-                <th className="hand" onClick={sort('notes')}>
-                  <Translate contentKey="healthyMeApp.doctor.notes">Notes</Translate>{' '}
-                  <FontAwesomeIcon icon={getSortIconByFieldName('notes')} />
-                </th>
-                <th>
-                  <Translate contentKey="healthyMeApp.doctor.owner">Owner</Translate> <FontAwesomeIcon icon="sort" />
-                </th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {doctorList.map((doctor, i) => (
-                <tr key={`entity-${i}`} data-cy="entityTable">
-                  <td>
-                    <Button tag={Link} to={`/doctor/${doctor.id}`} color="link" size="sm">
-                      {doctor.id}
-                    </Button>
-                  </td>
-                  <td>{doctor.firstName}</td>
-                  <td>{doctor.lastName}</td>
-                  <td>{doctor.specialty}</td>
-                  <td>{doctor.phone}</td>
-                  <td>{doctor.address}</td>
-                  <td>{doctor.notes}</td>
-                  <td>{doctor.owner ? doctor.owner.login : ''}</td>
-                  <td className="text-end">
-                    <div className="btn-group flex-btn-group-container">
-                      <Button tag={Link} to={`/doctor/${doctor.id}`} color="info" size="sm" data-cy="entityDetailsButton">
-                        <FontAwesomeIcon icon="eye" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.view">View</Translate>
-                        </span>
-                      </Button>
-                      <Button
-                        tag={Link}
-                        to={`/doctor/${doctor.id}/edit?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`}
-                        color="primary"
-                        size="sm"
-                        data-cy="entityEditButton"
-                      >
-                        <FontAwesomeIcon icon="pencil-alt" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.edit">Edit</Translate>
-                        </span>
-                      </Button>
-                      <Button
-                        onClick={() =>
-                          (window.location.href = `/doctor/${doctor.id}/delete?page=${paginationState.activePage}&sort=${paginationState.sort},${paginationState.order}`)
-                        }
-                        color="danger"
-                        size="sm"
-                        data-cy="entityDeleteButton"
-                      >
-                        <FontAwesomeIcon icon="trash" />{' '}
-                        <span className="d-none d-md-inline">
-                          <Translate contentKey="entity.action.delete">Delete</Translate>
-                        </span>
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        ) : (
-          !loading && (
-            <div className="alert alert-warning">
-              <Translate contentKey="healthyMeApp.doctor.home.notFound">No Doctors found</Translate>
-            </div>
-          )
-        )}
+    <div className="doctors-phonebook-page">
+      <div className="page-header">
+        <h2 className="page-title">📞 Κατάλογος Γιατρών</h2>
+        <Link to="/doctor/new" className="create-btn">
+          ➕ Νέος Γιατρός
+        </Link>
       </div>
-      {totalItems ? (
-        <div className={doctorList && doctorList.length > 0 ? '' : 'd-none'}>
-          <div className="justify-content-center d-flex">
-            <JhiItemCount page={paginationState.activePage} total={totalItems} itemsPerPage={paginationState.itemsPerPage} i18nEnabled />
-          </div>
-          <div className="justify-content-center d-flex">
-            <JhiPagination
-              activePage={paginationState.activePage}
-              onSelect={handlePagination}
-              maxButtons={5}
-              itemsPerPage={paginationState.itemsPerPage}
-              totalItems={totalItems}
-            />
-          </div>
+
+      {/* Search and Filter Section */}
+      <div className="search-filter-section">
+        <Row>
+          <Col md="8">
+            <div className="search-box">
+              <Input
+                type="text"
+                placeholder="Αναζήτηση γιατρού (όνομα, ειδικότητα, τηλέφωνο)..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="search-input"
+              />
+              <div className="search-icon">🔍</div>
+            </div>
+          </Col>
+          <Col md="4">
+            <div className="specialty-filter">
+              <select
+                value={selectedSpecialty || ''}
+                onChange={e => setSelectedSpecialty(e.target.value || null)}
+                className="specialty-select"
+              >
+                <option value="">Όλες οι ειδικότητες</option>
+                {uniqueSpecialties.map(specialty => (
+                  <option key={specialty} value={specialty}>
+                    {getSpecialtyIcon(specialty)} {specialty}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </Col>
+        </Row>
+      </div>
+
+      {/* Results Summary */}
+      {searchTerm || selectedSpecialty ? (
+        <div className="results-summary">
+          Βρέθηκαν {filteredDoctors.length} γιατροί
+          {searchTerm && ` για "${searchTerm}"`}
+          {selectedSpecialty && ` στην ειδικότητα "${selectedSpecialty}"`}
         </div>
-      ) : (
-        ''
-      )}
+      ) : null}
+
+      {/* Doctors Grid */}
+      <Row className="doctors-grid">
+        {filteredDoctors.length === 0
+          ? !loading && (
+              <Col xs="12">
+                <div className="empty-state">
+                  <div className="empty-icon">👨‍⚕️</div>
+                  <h3>Δεν βρέθηκαν γιατροί</h3>
+                  <p>
+                    {searchTerm || selectedSpecialty
+                      ? 'Δοκιμάστε να αλλάξετε τα κριτήρια αναζήτησης'
+                      : 'Προσθέστε τον πρώτο γιατρό στον κατάλογό σας'}
+                  </p>
+                  {!searchTerm && !selectedSpecialty && (
+                    <Link to="/doctor/new" className="create-btn">
+                      ➕ Προσθήκη Γιατρού
+                    </Link>
+                  )}
+                </div>
+              </Col>
+            )
+          : filteredDoctors.map(doctor => (
+              <Col key={doctor.id} lg="6" xl="4" className="doctor-col">
+                {renderDoctorCard(doctor)}
+              </Col>
+            ))}
+      </Row>
     </div>
   );
 };
 
-export default Doctor;
+export default DoctorsPhonebook;

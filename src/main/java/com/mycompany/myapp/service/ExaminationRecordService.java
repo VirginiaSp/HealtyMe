@@ -1,7 +1,9 @@
 package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.ExaminationRecord;
+import com.mycompany.myapp.domain.User;
 import com.mycompany.myapp.repository.ExaminationRecordRepository;
+import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.service.dto.ExaminationRecordDTO;
 import com.mycompany.myapp.service.mapper.ExaminationRecordMapper;
 import java.util.Optional;
@@ -22,15 +24,17 @@ public class ExaminationRecordService {
     private static final Logger LOG = LoggerFactory.getLogger(ExaminationRecordService.class);
 
     private final ExaminationRecordRepository examinationRecordRepository;
-
     private final ExaminationRecordMapper examinationRecordMapper;
+    private final UserRepository userRepository; // ADD THIS
 
     public ExaminationRecordService(
         ExaminationRecordRepository examinationRecordRepository,
-        ExaminationRecordMapper examinationRecordMapper
+        ExaminationRecordMapper examinationRecordMapper,
+        UserRepository userRepository // ADD THIS PARAMETER
     ) {
         this.examinationRecordRepository = examinationRecordRepository;
         this.examinationRecordMapper = examinationRecordMapper;
+        this.userRepository = userRepository; // ADD THIS LINE
     }
 
     /**
@@ -42,6 +46,32 @@ public class ExaminationRecordService {
     public ExaminationRecordDTO save(ExaminationRecordDTO examinationRecordDTO) {
         LOG.debug("Request to save ExaminationRecord : {}", examinationRecordDTO);
         ExaminationRecord examinationRecord = examinationRecordMapper.toEntity(examinationRecordDTO);
+        examinationRecord = examinationRecordRepository.save(examinationRecord);
+        return examinationRecordMapper.toDto(examinationRecord);
+    }
+
+    /**
+     * Save a examinationRecord with current user as owner.
+     *
+     * @param examinationRecordDTO the entity to save.
+     * @param currentUserLogin the login of the current user.
+     * @return the persisted entity.
+     */
+    public ExaminationRecordDTO saveWithCurrentUser(ExaminationRecordDTO examinationRecordDTO, String currentUserLogin) {
+        LOG.debug("Request to save ExaminationRecord with current user : {}", examinationRecordDTO);
+
+        // Find current user
+        User currentUser = userRepository
+            .findOneByLogin(currentUserLogin)
+            .orElseThrow(() -> new RuntimeException("User not found: " + currentUserLogin));
+
+        // Convert DTO to entity
+        ExaminationRecord examinationRecord = examinationRecordMapper.toEntity(examinationRecordDTO);
+
+        // Set the owner
+        examinationRecord.setOwner(currentUser);
+
+        // Save and return
         examinationRecord = examinationRecordRepository.save(examinationRecord);
         return examinationRecordMapper.toDto(examinationRecord);
     }
