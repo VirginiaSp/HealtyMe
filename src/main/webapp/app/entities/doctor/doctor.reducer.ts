@@ -39,7 +39,8 @@ export const getEntity = createAsyncThunk(
 export const createEntity = createAsyncThunk(
   'doctor/create_entity',
   async (entity: IDoctor, thunkAPI) => {
-    const result = await axios.post<IDoctor>(apiUrl, cleanEntity(entity));
+    // Don't use cleanEntity for doctor creation since we need the owner field
+    const result = await axios.post<IDoctor>(apiUrl, entity);
     thunkAPI.dispatch(getEntities({}));
     return result;
   },

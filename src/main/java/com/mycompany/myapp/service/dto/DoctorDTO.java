@@ -28,7 +28,7 @@ public class DoctorDTO implements Serializable {
     @Size(max = 1000)
     private String notes;
 
-    @NotNull
+    // @NotNull  // Temporarily removed - owner will be set by backend
     private UserDTO owner;
 
     public Long getId() {

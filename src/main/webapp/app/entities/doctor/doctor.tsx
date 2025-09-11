@@ -56,17 +56,26 @@ export const DoctorsPhonebook = () => {
     dispatch(getEntities({}));
   }, [dispatch]);
 
-  const filteredDoctors = doctorList.filter(doctor => {
-    const matchesSearch =
-      doctor.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doctor.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doctor.specialty?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      doctor.phone?.includes(searchTerm);
+  const filteredDoctors = doctorList
+    .filter(doctor => {
+      const matchesSearch =
+        doctor.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doctor.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doctor.specialty?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        doctor.phone?.includes(searchTerm);
 
-    const matchesSpecialty = !selectedSpecialty || doctor.specialty === selectedSpecialty;
+      const matchesSpecialty = !selectedSpecialty || doctor.specialty === selectedSpecialty;
 
-    return matchesSearch && matchesSpecialty;
-  });
+      return matchesSearch && matchesSpecialty;
+    })
+    .sort((a, b) => {
+      // Sort alphabetically by last name, then by first name
+      const lastNameComparison = (a.lastName || '').localeCompare(b.lastName || '');
+      if (lastNameComparison !== 0) {
+        return lastNameComparison;
+      }
+      return (a.firstName || '').localeCompare(b.firstName || '');
+    });
 
   const uniqueSpecialties = [...new Set(doctorList.map(doctor => doctor.specialty).filter(Boolean))] as string[];
 
@@ -88,7 +97,7 @@ export const DoctorsPhonebook = () => {
           </div>
           <div className="doctor-info">
             <h3 className="doctor-name">
-              Δρ. {doctor.firstName} {doctor.lastName}
+              {doctor.firstName} {doctor.lastName}
             </h3>
             <span
               className="specialty-badge"
@@ -135,9 +144,6 @@ export const DoctorsPhonebook = () => {
         </div>
 
         <div className="doctor-card-actions">
-          <Button className="action-btn call-btn" onClick={() => handleCall(doctor.phone)} disabled={!doctor.phone}>
-            📞 Κλήση
-          </Button>
           <Button tag={Link} to={`/doctor/${doctor.id}`} className="action-btn view-btn">
             👁️ Προβολή
           </Button>

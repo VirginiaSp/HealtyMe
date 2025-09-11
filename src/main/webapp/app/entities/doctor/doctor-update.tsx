@@ -2,23 +2,19 @@ import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
 import { ValidatedField, ValidatedForm } from 'react-jhipster';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { createEntity, updateEntity } from './doctor.reducer';
 import './doctor-update.scss';
 
-interface StateProps {
-  loading?: boolean;
-}
-
-interface DispatchProps {
-  updateEntity?: (entity: any) => void;
-}
-
-export interface IDoctorUpdateProps extends StateProps, DispatchProps {}
-
-export const DoctorUpdate = (props: IDoctorUpdateProps) => {
+export const DoctorUpdate = () => {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [phones, setPhones] = useState<string[]>(['']);
   const [addresses, setAddresses] = useState<string[]>(['']);
+
+  const isNew = !id;
+  const updating = useAppSelector(state => state.doctor.updating);
 
   const addPhoneField = () => {
     setPhones([...phones, '']);
@@ -53,20 +49,25 @@ export const DoctorUpdate = (props: IDoctorUpdateProps) => {
   };
 
   const saveEntity = (values: any) => {
-    // Combine multiple phones and addresses
+    // Prepare the entity data
     const entity = {
       ...values,
-      phones: phones.filter(phone => phone.trim() !== ''),
-      addresses: addresses.filter(address => address.trim() !== ''),
+      // Take the first phone number (since your backend expects a single phone field)
+      phone: phones.find(phone => phone.trim() !== '') || '',
+      // Take the first address (since your backend expects a single address field)
+      address: addresses.find(address => address.trim() !== '') || '',
     };
 
-    // Your save logic here - replace this with actual save logic
-    if (props.updateEntity) {
-      props.updateEntity(entity);
+    // Dispatch the appropriate action
+    if (isNew) {
+      dispatch(createEntity(entity)).then(() => {
+        navigate('/doctor');
+      });
+    } else {
+      dispatch(updateEntity({ ...entity, id })).then(() => {
+        navigate('/doctor');
+      });
     }
-
-    // Navigate back to doctor list after saving
-    navigate('/doctor');
   };
 
   const defaultValues = () => ({
@@ -88,7 +89,7 @@ export const DoctorUpdate = (props: IDoctorUpdateProps) => {
                 <path d="m22 21-3-3"></path>
               </svg>
             </div>
-            Δημιουργία ή Επεξεργασία Γιατρού
+            {isNew ? 'Δημιουργία Γιατρού' : 'Επεξεργασία Γιατρού'}
           </h1>
           <p className="header-subtitle">Συμπληρώστε τα στοιχεία του γιατρού</p>
         </div>
@@ -147,9 +148,16 @@ export const DoctorUpdate = (props: IDoctorUpdateProps) => {
                   <svg className="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                   </svg>
-                  Ειδικότητα
+                  Ειδικότητα <span className="required-indicator">*</span>
                 </label>
-                <ValidatedField className="custom-input" name="specialty" placeholder="π.χ. Καρδιολόγος" />
+                <ValidatedField
+                  className="custom-input"
+                  name="specialty"
+                  placeholder="π.χ. Καρδιολόγος"
+                  validate={{
+                    required: { value: true, message: 'Το πεδίο είναι υποχρεωτικό.' },
+                  }}
+                />
               </div>
             </Col>
 
@@ -261,13 +269,13 @@ export const DoctorUpdate = (props: IDoctorUpdateProps) => {
               </svg>
               Πίσω
             </Button>
-            <Button type="submit" className="btn-modern btn-primary">
+            <Button type="submit" className="btn-modern btn-primary" disabled={updating}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                 <polyline points="17,21 17,13 7,13 7,21"></polyline>
                 <polyline points="7,3 7,8 15,8"></polyline>
               </svg>
-              Αποθήκευση
+              {updating ? 'Αποθήκευση...' : 'Αποθήκευση'}
             </Button>
           </div>
         </ValidatedForm>
