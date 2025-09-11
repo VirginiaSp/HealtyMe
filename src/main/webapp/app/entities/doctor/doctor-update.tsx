@@ -12,6 +12,7 @@ export const DoctorUpdate = () => {
   const { id } = useParams<{ id: string }>();
   const [phones, setPhones] = useState<string[]>(['']);
   const [addresses, setAddresses] = useState<string[]>(['']);
+  const account = useAppSelector(state => state.authentication.account);
 
   const isNew = !id;
   const updating = useAppSelector(state => state.doctor.updating);
@@ -52,10 +53,10 @@ export const DoctorUpdate = () => {
     // Prepare the entity data
     const entity = {
       ...values,
-      // Take the first phone number (since your backend expects a single phone field)
       phone: phones.find(phone => phone.trim() !== '') || '',
-      // Take the first address (since your backend expects a single address field)
       address: addresses.find(address => address.trim() !== '') || '',
+      // ΠΡΟΣΘΗΚΗ: Βάλε το owner αν υπάρχει account (ΑΥΤΟ ΕΙΝΑΙ ΟΛΟ ΤΟ FIX)
+      owner: account && account.id ? { id: account.id } : undefined,
     };
 
     // Dispatch the appropriate action
