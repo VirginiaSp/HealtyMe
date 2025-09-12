@@ -1,51 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Row, Col, Card, CardBody, Badge, Button } from 'reactstrap';
+import { useAppDispatch, useAppSelector } from 'app/config/store';
+import { getEntity } from './doctor.reducer';
+import axios from 'axios';
 import './doctor-detail.scss';
 
-// You can replace this interface with your actual doctor interface
-interface IDoctor {
-  id?: number;
-  firstName: string;
-  lastName: string;
-  specialty?: string;
-  phones?: string[];
-  addresses?: string[];
-  notes?: string;
-}
-
 interface IVisit {
-  id: number;
+  id?: number;
   date: string;
   type: string;
   notes: string;
+  doctorId?: number;
 }
 
 export const DoctorDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [doctor, setDoctor] = useState<IDoctor | null>(null);
-  const [visitHistory, setVisitHistory] = useState<IVisit[]>([
-    {
-      id: 1,
-      date: '2025-09-10',
-      type: 'Τακτικός έλεγχος',
-      notes: 'Γενική εξέταση - όλα καλά',
-    },
-    {
-      id: 2,
-      date: '2025-08-15',
-      type: 'Επανεξέταση',
-      notes: 'Έλεγχος αποτελεσμάτων εξετάσεων',
-    },
-    {
-      id: 3,
-      date: '2025-07-20',
-      type: 'Πρώτη επίσκεψη',
-      notes: 'Αρχική διάγνωση και σχέδιο θεραπείας',
-    },
-  ]);
+  const dispatch = useAppDispatch();
+
+  // Get doctor data from Redux store
+  const doctor = useAppSelector(state => state.doctor.entity);
+  const loading = useAppSelector(state => state.doctor.loading);
+
+  // All state variables
+  const [visitHistory, setVisitHistory] = useState<IVisit[]>([]);
+  const [loadingVisits, setLoadingVisits] = useState(false);
   const [showAddVisit, setShowAddVisit] = useState(false);
+  const [editingVisit, setEditingVisit] = useState<IVisit | null>(null);
   const [newVisit, setNewVisit] = useState({
     date: '',
     type: '',
@@ -57,42 +39,217 @@ export const DoctorDetail = () => {
     notes: false,
   });
 
-  // Mock data - replace with actual API call
+  // Function to format date for display
+  const formatDateForDisplay = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('el-GR');
+    } catch (e) {
+      return dateString;
+    }
+  };
+
+  // Fetch doctor data when component mounts or ID changes
   useEffect(() => {
-    // Simulate API call
-    const mockDoctor: IDoctor = {
-      id: parseInt(id || '1', 10),
-      firstName: 'Bennett',
-      lastName: 'Koepp',
-      specialty: 'department always',
-      phones: ['460.486.6703'],
-      addresses: ['why early truly'],
-      notes: 'excitedly',
+    if (id) {
+      console.warn('Fetching doctor with ID:', id);
+      dispatch(getEntity(id));
+    }
+  }, [id, dispatch]);
+
+  // Fetch visit history from backend API
+  useEffect(() => {
+    const fetchVisits = async () => {
+      if (id) {
+        setLoadingVisits(true);
+        try {
+          console.warn('Fetching visits for doctor ID:', id);
+          const response = await axios.get(`/api/doctors/${id}/visits`);
+          setVisitHistory(response.data);
+          console.warn('Loaded', response.data.length, 'visits for doctor', id);
+        } catch (error) {
+          console.error('Error fetching visits:', error);
+          setVisitHistory([]);
+        } finally {
+          setLoadingVisits(false);
+        }
+      }
     };
-    setDoctor(mockDoctor);
+
+    fetchVisits();
   }, [id]);
 
-  const handleAddVisit = () => {
-    if (newVisit.date && newVisit.type && newVisit.notes) {
-      const visit: IVisit = {
-        id: visitHistory.length + 1,
-        date: newVisit.date,
-        type: newVisit.type,
-        notes: newVisit.notes,
-      };
-      setVisitHistory([visit, ...visitHistory]); // Add to beginning for newest first
-      setNewVisit({ date: '', type: '', notes: '' });
-      setShowAddVisit(false);
+  // Function to save visit to backend
+  const saveVisitToBackend = async (visitData: Omit<IVisit, 'id'>) => {
+    if (!id) return null;
+
+    try {
+      console.warn('Saving visit to backend for doctor', id, ':', visitData);
+      const response = await axios.post(`/api/doctors/${id}/visits`, visitData);
+      console.warn('Visit saved successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error saving visit:', error);
+      throw error;
+    }
+  };
+
+  // Function to update visit in backend
+  const updateVisitInBackend = async (visitId: number, visitData: Omit<IVisit, 'id'>) => {
+    if (!id) return null;
+
+    try {
+      console.warn('Updating visit', visitId, 'for doctor', id, ':', visitData);
+      const response = await axios.put(`/api/doctors/${id}/visits/${visitId}`, visitData);
+      console.warn('Visit updated successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating visit:', error);
+      throw error;
+    }
+  };
+
+  // Function to delete visit from backend
+  const deleteVisitFromBackend = async (visitId: number) => {
+    if (!id) return;
+
+    try {
+      console.warn('Deleting visit', visitId, 'for doctor', id);
+      await axios.delete(`/api/doctors/${id}/visits/${visitId}`);
+      console.warn('Visit deleted successfully');
+    } catch (error) {
+      console.error('Error deleting visit:', error);
+      throw error;
+    }
+  };
+
+  const handleAddVisit = async () => {
+    // Validate form
+    const errors = {
+      date: !newVisit.date,
+      type: !newVisit.type.trim(),
+      notes: !newVisit.notes.trim(),
+    };
+
+    setFormErrors(errors);
+
+    // If no errors, save the visit to backend
+    if (!errors.date && !errors.type && !errors.notes) {
+      try {
+        const visitData = {
+          date: newVisit.date,
+          type: newVisit.type,
+          notes: newVisit.notes,
+        };
+
+        // Save to backend
+        const savedVisit = await saveVisitToBackend(visitData);
+
+        if (savedVisit) {
+          // Add to local state for immediate UI update
+          const newHistory = [savedVisit, ...visitHistory];
+          setVisitHistory(newHistory);
+
+          // Clear form
+          setNewVisit({ date: '', type: '', notes: '' });
+          setFormErrors({ date: false, type: false, notes: false });
+          setShowAddVisit(false);
+
+          console.warn('Visit added successfully! Total visits now:', newHistory.length);
+        }
+      } catch (error) {
+        console.error('Failed to save visit:', error);
+        alert('Failed to save visit. Please try again.');
+      }
+    }
+  };
+
+  const handleEditVisit = (visit: IVisit) => {
+    setEditingVisit(visit);
+    setNewVisit({
+      date: visit.date,
+      type: visit.type,
+      notes: visit.notes,
+    });
+    setShowAddVisit(true);
+  };
+
+  const handleUpdateVisit = async () => {
+    if (!editingVisit || !editingVisit.id) return;
+
+    // Validate form
+    const errors = {
+      date: !newVisit.date,
+      type: !newVisit.type.trim(),
+      notes: !newVisit.notes.trim(),
+    };
+
+    setFormErrors(errors);
+
+    // If no errors, update the visit in backend
+    if (!errors.date && !errors.type && !errors.notes) {
+      try {
+        const visitData = {
+          date: newVisit.date,
+          type: newVisit.type,
+          notes: newVisit.notes,
+        };
+
+        // Update in backend
+        const updatedVisit = await updateVisitInBackend(editingVisit.id, visitData);
+
+        if (updatedVisit) {
+          // Update local state
+          const newHistory = visitHistory.map(visit => (visit.id === editingVisit.id ? updatedVisit : visit));
+          setVisitHistory(newHistory);
+
+          // Clear form
+          setNewVisit({ date: '', type: '', notes: '' });
+          setFormErrors({ date: false, type: false, notes: false });
+          setShowAddVisit(false);
+          setEditingVisit(null);
+
+          console.warn('Visit updated successfully!');
+        }
+      } catch (error) {
+        console.error('Failed to update visit:', error);
+        alert('Failed to update visit. Please try again.');
+      }
+    }
+  };
+
+  const handleDeleteVisit = async (visit: IVisit) => {
+    if (!visit.id) return;
+
+    if (window.confirm('Είστε σίγουροι ότι θέλετε να διαγράψετε αυτήν την επίσκεψη;')) {
+      try {
+        await deleteVisitFromBackend(visit.id);
+
+        // Remove from local state
+        const newHistory = visitHistory.filter(v => v.id !== visit.id);
+        setVisitHistory(newHistory);
+
+        console.warn('Visit deleted successfully!');
+      } catch (error) {
+        console.error('Failed to delete visit:', error);
+        alert('Failed to delete visit. Please try again.');
+      }
     }
   };
 
   const handleCancelAdd = () => {
     setNewVisit({ date: '', type: '', notes: '' });
+    setFormErrors({ date: false, type: false, notes: false });
     setShowAddVisit(false);
+    setEditingVisit(null);
   };
 
-  if (!doctor) {
+  if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (!doctor) {
+    return <div>Doctor not found</div>;
   }
 
   return (
@@ -178,45 +335,35 @@ export const DoctorDetail = () => {
                     </div>
                   )}
 
-                  {doctor.phones && doctor.phones.length > 0 && (
+                  {doctor.phone && (
                     <div className="detail-item">
                       <label className="detail-label">
                         <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                         </svg>
-                        Τηλέφωνα
+                        Τηλέφωνο
                       </label>
                       <div className="multi-values">
-                        {doctor.phones
-                          .filter(phone => phone.trim())
-                          .map((phone, index) => (
-                            <div key={index} className="value-item">
-                              <a href={`tel:${phone}`} className="phone-link">
-                                {phone}
-                              </a>
-                            </div>
-                          ))}
+                        <div className="value-item">
+                          <a href={`tel:${doctor.phone}`} className="phone-link">
+                            {doctor.phone}
+                          </a>
+                        </div>
                       </div>
                     </div>
                   )}
 
-                  {doctor.addresses && doctor.addresses.length > 0 && (
+                  {doctor.address && (
                     <div className="detail-item">
                       <label className="detail-label">
                         <svg className="detail-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                           <circle cx="12" cy="10" r="3"></circle>
                         </svg>
-                        Διευθύνσεις
+                        Διεύθυνση
                       </label>
                       <div className="multi-values">
-                        {doctor.addresses
-                          .filter(address => address.trim())
-                          .map((address, index) => (
-                            <div key={index} className="value-item">
-                              {address}
-                            </div>
-                          ))}
+                        <div className="value-item">{doctor.address}</div>
                       </div>
                     </div>
                   )}
@@ -255,9 +402,10 @@ export const DoctorDetail = () => {
                   Ιστορικό Επισκέψεων & Διαγνώσεων
                 </h5>
 
-                {/* Add Visit Form */}
+                {/* Add/Edit Visit Form */}
                 {showAddVisit && (
                   <div className="add-visit-form">
+                    <h6 style={{ marginBottom: '15px', color: '#374151' }}>{editingVisit ? 'Επεξεργασία Επίσκεψης' : 'Νέα Επίσκεψη'}</h6>
                     <Row>
                       <Col md="6">
                         <label className="form-label">
@@ -267,7 +415,12 @@ export const DoctorDetail = () => {
                           type="date"
                           className={`form-control ${formErrors.date ? 'is-invalid' : ''}`}
                           value={newVisit.date}
-                          onChange={e => setNewVisit({ ...newVisit, date: e.target.value })}
+                          onChange={e => {
+                            setNewVisit({ ...newVisit, date: e.target.value });
+                            if (formErrors.date && e.target.value) {
+                              setFormErrors({ ...formErrors, date: false });
+                            }
+                          }}
                         />
                         {formErrors.date && <div className="error-message">Παρακαλώ συμπληρώστε την ημερομηνία</div>}
                       </Col>
@@ -280,7 +433,12 @@ export const DoctorDetail = () => {
                           className={`form-control ${formErrors.type ? 'is-invalid' : ''}`}
                           placeholder="π.χ. Τακτικός έλεγχος"
                           value={newVisit.type}
-                          onChange={e => setNewVisit({ ...newVisit, type: e.target.value })}
+                          onChange={e => {
+                            setNewVisit({ ...newVisit, type: e.target.value });
+                            if (formErrors.type && e.target.value.trim()) {
+                              setFormErrors({ ...formErrors, type: false });
+                            }
+                          }}
                         />
                         {formErrors.type && <div className="error-message">Παρακαλώ συμπληρώστε τον τύπο επίσκεψης</div>}
                       </Col>
@@ -301,21 +459,14 @@ export const DoctorDetail = () => {
                           }
                         }}
                       />
-                      {formErrors.notes && (
-                        <div
-                          className="error-message"
-                          style={{ display: 'block', color: 'red', backgroundColor: 'yellow', padding: '10px', fontSize: '16px' }}
-                        >
-                          ⚠ Παρακαλώ συμπληρώστε τις σημειώσεις
-                        </div>
-                      )}
+                      {formErrors.notes && <div className="error-message">Παρακαλώ συμπληρώστε τις σημειώσεις</div>}
                     </div>
                     <div className="form-actions mt-3">
-                      <Button type="button" color="success" size="sm" onClick={handleAddVisit}>
+                      <Button type="button" color="success" size="sm" onClick={editingVisit ? handleUpdateVisit : handleAddVisit}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <polyline points="20,6 9,17 4,12"></polyline>
                         </svg>
-                        Αποθήκευση
+                        {editingVisit ? 'Ενημέρωση' : 'Αποθήκευση'}
                       </Button>
                       <Button type="button" color="secondary" size="sm" onClick={handleCancelAdd}>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -329,17 +480,49 @@ export const DoctorDetail = () => {
                 )}
 
                 <div className="visit-history">
-                  {visitHistory.map(visit => (
-                    <div key={visit.id} className="visit-item">
-                      <div className="visit-header">
-                        <span className="visit-date">{visit.date}</span>
-                        <Badge color="secondary" className="visit-type">
-                          {visit.type}
-                        </Badge>
+                  {loadingVisits ? (
+                    <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>Loading visits...</div>
+                  ) : visitHistory.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>No visits recorded yet.</div>
+                  ) : (
+                    visitHistory.map(visit => (
+                      <div key={visit.id} className="visit-item">
+                        <div className="visit-header">
+                          <span className="visit-date">{formatDateForDisplay(visit.date)}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Badge color="secondary" className="visit-type">
+                              {visit.type}
+                            </Badge>
+                            <Button
+                              size="sm"
+                              color="link"
+                              onClick={() => handleEditVisit(visit)}
+                              style={{ padding: '2px 6px', fontSize: '12px' }}
+                              title="Επεξεργασία"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                              </svg>
+                            </Button>
+                            <Button
+                              size="sm"
+                              color="link"
+                              onClick={() => handleDeleteVisit(visit)}
+                              style={{ padding: '2px 6px', fontSize: '12px', color: '#dc3545' }}
+                              title="Διαγραφή"
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="3,6 5,6 21,6"></polyline>
+                                <path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+                              </svg>
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="visit-notes">{visit.notes}</p>
                       </div>
-                      <p className="visit-notes">{visit.notes}</p>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
 
                 {!showAddVisit && (

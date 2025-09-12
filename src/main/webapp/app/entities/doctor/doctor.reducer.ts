@@ -39,6 +39,11 @@ export const getEntity = createAsyncThunk(
 export const createEntity = createAsyncThunk(
   'doctor/create_entity',
   async (entity: IDoctor, thunkAPI) => {
+    console.warn('🔍 DEBUGGING: Creating doctor with this payload:', entity);
+    console.warn('🔍 DEBUGGING: Payload keys:', Object.keys(entity));
+    console.warn('🔍 DEBUGGING: firstName value:', entity.firstName);
+    console.warn('🔍 DEBUGGING: lastName value:', entity.lastName);
+
     // Don't use cleanEntity for doctor creation since we need the owner field
     const result = await axios.post<IDoctor>(apiUrl, entity);
     thunkAPI.dispatch(getEntities({}));

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
-import { ValidatedField, ValidatedForm } from 'react-jhipster';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { createEntity, updateEntity } from './doctor.reducer';
 import './doctor-update.scss';
@@ -10,12 +9,38 @@ export const DoctorUpdate = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const account = useAppSelector(state => state.authentication.account);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    specialty: '',
+    notes: '',
+  });
+
   const [phones, setPhones] = useState<string[]>(['']);
   const [addresses, setAddresses] = useState<string[]>(['']);
-  const account = useAppSelector(state => state.authentication.account);
+  const [errors, setErrors] = useState<any>({});
 
   const isNew = !id;
   const updating = useAppSelector(state => state.doctor.updating);
+
+  // Handle form field changes
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({
+        ...prev,
+        [field]: null,
+      }));
+    }
+  };
 
   const addPhoneField = () => {
     setPhones([...phones, '']);
@@ -49,15 +74,44 @@ export const DoctorUpdate = () => {
     setAddresses(newAddresses);
   };
 
-  const saveEntity = (values: any) => {
+  // Validate form
+  const validateForm = () => {
+    const newErrors: any = {};
+
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'Το πεδίο είναι υποχρεωτικό.';
+    }
+
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Το πεδίο είναι υποχρεωτικό.';
+    }
+
+    if (!formData.specialty.trim()) {
+      newErrors.specialty = 'Το πεδίο είναι υποχρεωτικό.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    console.warn('🔍 FORM VALUES RECEIVED:', formData);
+
     // Prepare the entity data
     const entity = {
-      ...values,
+      ...formData,
       phone: phones.find(phone => phone.trim() !== '') || '',
       address: addresses.find(address => address.trim() !== '') || '',
-      // ΠΡΟΣΘΗΚΗ: Βάλε το owner αν υπάρχει account (ΑΥΤΟ ΕΙΝΑΙ ΟΛΟ ΤΟ FIX)
       owner: account && account.id ? { id: account.id } : undefined,
     };
+
+    console.warn('🔍 FINAL ENTITY TO SEND:', entity);
 
     // Dispatch the appropriate action
     if (isNew) {
@@ -65,18 +119,11 @@ export const DoctorUpdate = () => {
         navigate('/doctor');
       });
     } else {
-      dispatch(updateEntity({ ...entity, id })).then(() => {
+      dispatch(updateEntity({ ...entity, id: parseInt(id, 10) })).then(() => {
         navigate('/doctor');
       });
     }
   };
-
-  const defaultValues = () => ({
-    firstName: '',
-    lastName: '',
-    specialty: '',
-    notes: '',
-  });
 
   return (
     <div className="modern-doctor-form">
@@ -101,7 +148,7 @@ export const DoctorUpdate = () => {
           <strong>Σημείωση:</strong> Τα πεδία με αστερίσκο (*) είναι υποχρεωτικά
         </div>
 
-        <ValidatedForm defaultValues={defaultValues()} onSubmit={saveEntity}>
+        <form onSubmit={handleSubmit}>
           <Row>
             <Col md="6">
               <div className="custom-field">
@@ -112,14 +159,14 @@ export const DoctorUpdate = () => {
                   </svg>
                   Όνομα <span className="required-indicator">*</span>
                 </label>
-                <ValidatedField
-                  className="custom-input"
-                  name="firstName"
+                <input
+                  type="text"
+                  className={`custom-input ${errors.firstName ? 'is-invalid' : ''}`}
+                  value={formData.firstName}
+                  onChange={e => handleInputChange('firstName', e.target.value)}
                   placeholder="π.χ. Γιάννης"
-                  validate={{
-                    required: { value: true, message: 'Το πεδίο είναι υποχρεωτικό.' },
-                  }}
                 />
+                {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
               </div>
             </Col>
 
@@ -132,14 +179,14 @@ export const DoctorUpdate = () => {
                   </svg>
                   Επίθετο <span className="required-indicator">*</span>
                 </label>
-                <ValidatedField
-                  className="custom-input"
-                  name="lastName"
+                <input
+                  type="text"
+                  className={`custom-input ${errors.lastName ? 'is-invalid' : ''}`}
+                  value={formData.lastName}
+                  onChange={e => handleInputChange('lastName', e.target.value)}
                   placeholder="π.χ. Παπαδόπουλος"
-                  validate={{
-                    required: { value: true, message: 'Το πεδίο είναι υποχρεωτικό.' },
-                  }}
                 />
+                {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
               </div>
             </Col>
 
@@ -151,14 +198,14 @@ export const DoctorUpdate = () => {
                   </svg>
                   Ειδικότητα <span className="required-indicator">*</span>
                 </label>
-                <ValidatedField
-                  className="custom-input"
-                  name="specialty"
+                <input
+                  type="text"
+                  className={`custom-input ${errors.specialty ? 'is-invalid' : ''}`}
+                  value={formData.specialty}
+                  onChange={e => handleInputChange('specialty', e.target.value)}
                   placeholder="π.χ. Καρδιολόγος"
-                  validate={{
-                    required: { value: true, message: 'Το πεδίο είναι υποχρεωτικό.' },
-                  }}
                 />
+                {errors.specialty && <div className="invalid-feedback">{errors.specialty}</div>}
               </div>
             </Col>
 
@@ -253,18 +300,19 @@ export const DoctorUpdate = () => {
                   </svg>
                   Σημειώσεις
                 </label>
-                <ValidatedField
-                  component="textarea"
+                <textarea
                   className="custom-input custom-textarea"
-                  name="notes"
+                  value={formData.notes}
+                  onChange={e => handleInputChange('notes', e.target.value)}
                   placeholder="Προαιρετικές σημειώσεις για τον γιατρό..."
+                  rows={4}
                 />
               </div>
             </Col>
           </Row>
 
           <div className="form-actions">
-            <Button className="btn-modern btn-secondary" onClick={() => navigate('/doctor')}>
+            <Button type="button" className="btn-modern btn-secondary" onClick={() => navigate('/doctor')}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="m15 18-6-6 6-6"></path>
               </svg>
@@ -279,7 +327,7 @@ export const DoctorUpdate = () => {
               {updating ? 'Αποθήκευση...' : 'Αποθήκευση'}
             </Button>
           </div>
-        </ValidatedForm>
+        </form>
       </div>
     </div>
   );
