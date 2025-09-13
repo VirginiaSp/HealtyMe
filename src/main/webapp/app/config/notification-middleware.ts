@@ -26,6 +26,16 @@ const getFieldErrorsToasts = (fieldErrors: FieldErrorVM[]): ToastMessage[] =>
     return { message: `Error on field "${fieldName}"`, key: `error.${fieldError.message}`, data: { fieldName } };
   });
 
+/**
+ * Notification middleware for handling Redux action responses.
+ *
+ * This middleware has high complexity due to the need to handle multiple
+ * different error scenarios and response types from the API. Each condition
+ * serves a specific purpose in providing appropriate user feedback.
+ *
+ * Complexity is intentionally high here to centralize all notification
+ * logic in one place rather than spreading it across multiple files.
+ */
 // eslint-disable-next-line complexity
 export default () => next => action => {
   const { error, payload } = action;
