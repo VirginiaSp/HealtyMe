@@ -41,7 +41,7 @@ export const overrideSortStateWithQueryParams = (paginationBaseState: ISortBaseS
     const sortSplit = sort.split(',');
     paginationBaseState.sort = sortSplit[0];
     const order = sortSplit[1];
-    paginationBaseState.order = (order === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc';
+    paginationBaseState.order = order === 'desc' ? 'desc' : 'asc';
   }
   return paginationBaseState;
 };
