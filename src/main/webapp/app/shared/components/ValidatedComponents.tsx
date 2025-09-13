@@ -9,9 +9,12 @@ interface ValidationRules {
   required?: boolean | { value: boolean; message: string };
   minlength?: { value: number; message: string };
   maxlength?: { value: number; message: string };
+  minLength?: { value: number; message: string }; // Support both for compatibility
+  maxLength?: { value: number; message: string }; // Support both for compatibility
   min?: { value: number; message: string };
   max?: { value: number; message: string };
   pattern?: { value: RegExp; message: string };
+  validate?: (value: any) => boolean | string;
 }
 
 /**
@@ -117,12 +120,13 @@ interface ValidatedFormProps {
   onSubmit: (data: any) => void;
   children: React.ReactNode;
   className?: string;
+  id?: string;
 }
 
 /**
  * ValidatedForm component to replace react-jhipster ValidatedForm
  */
-export const ValidatedForm: React.FC<ValidatedFormProps> = ({ defaultValues = {}, onSubmit, children, className, ...props }) => {
+export const ValidatedForm: React.FC<ValidatedFormProps> = ({ defaultValues = {}, onSubmit, children, className, id, ...props }) => {
   const [formData, setFormData] = React.useState(defaultValues);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
@@ -142,10 +146,10 @@ export const ValidatedForm: React.FC<ValidatedFormProps> = ({ defaultValues = {}
   };
 
   return (
-    <form onSubmit={handleSubmit} className={className} {...props}>
+    <form onSubmit={handleSubmit} className={className} id={id} {...props}>
       {React.Children.map(children, child => {
         if (React.isValidElement(child) && child.type === ValidatedField) {
-          return React.cloneElement(child, {
+          return React.cloneElement(child as any, {
             value: formData[child.props.name] || '',
             onChange: handleFieldChange,
             error: errors[child.props.name],

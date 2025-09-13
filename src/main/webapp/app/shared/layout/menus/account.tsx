@@ -1,6 +1,7 @@
 import React from 'react';
 import MenuItem from 'app/shared/layout/menus/menu-item';
-import { Translate, translate } from 'react-jhipster';
+import { Translate } from 'app/shared/components/Translate';
+import { translate } from 'app/shared/util/translation-utils';
 import { NavDropdown } from './menu-components';
 
 const accountMenuItemsAuthenticated = () => (

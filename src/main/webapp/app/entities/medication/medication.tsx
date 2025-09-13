@@ -527,7 +527,7 @@ export const Medication = () => {
             <FontAwesomeIcon icon={faSync} spin={loading} />{' '}
             <Translate contentKey="healthyMeApp.medication.home.refreshListLabel">Refresh List</Translate>
           </Button>
-          <Link to="/medication/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+          <Link to="/medication/new" className="btn btn-primary create-entity-btn" id="create-entity-btn" data-cy="entityCreateButton">
             <FontAwesomeIcon icon={faPlus} />
             &nbsp;
             <Translate contentKey="healthyMeApp.medication.home.createLabel">Create new Medication</Translate>

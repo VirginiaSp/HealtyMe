@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'reactstrap';
-import { Translate, getSortState } from 'react-jhipster';
+import { Translate } from 'app/shared/components/Translate';
+import { getSortState } from 'app/shared/util/pagination-utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort, faSortDown, faSortUp } from '@fortawesome/free-solid-svg-icons';
 import { ASC, DESC } from 'app/shared/util/pagination.constants';
@@ -71,7 +72,7 @@ export const UserProfile = () => {
             <FontAwesomeIcon icon="sync" spin={loading} />{' '}
             <Translate contentKey="healthyMeApp.userProfile.home.refreshListLabel">Refresh List</Translate>
           </Button>
-          <Link to="/user-profile/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+          <Link to="/user-profile/new" className="btn btn-primary create-entity-btn" id="create-entity-btn" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
             &nbsp;
             <Translate contentKey="healthyMeApp.userProfile.home.createLabel">Create new User Profile</Translate>

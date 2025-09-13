@@ -72,7 +72,7 @@ export const MedicationPlan = () => {
             <FontAwesomeIcon icon="sync" spin={loading} />{' '}
             <Translate contentKey="healthyMeApp.medicationPlan.home.refreshListLabel">Refresh List</Translate>
           </Button>
-          <Link to="/medication-plan/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+          <Link to="/medication-plan/new" className="btn btn-primary create-entity-btn" id="create-entity-btn" data-cy="entityCreateButton">
             <FontAwesomeIcon icon="plus" />
             &nbsp;
             <Translate contentKey="healthyMeApp.medicationPlan.home.createLabel">Create new Medication Plan</Translate>

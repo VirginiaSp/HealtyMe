@@ -26,7 +26,7 @@ export const UserManagementDetail = () => {
         <Translate contentKey="userManagement.detail.title">User</Translate> [<strong>{user.login}</strong>]
       </h2>
       <Row size="md">
-        <dl className="jh-entity-details">
+        <dl className="entity-details">
           <dt>
             <Translate contentKey="userManagement.login">Login</Translate>
           </dt>

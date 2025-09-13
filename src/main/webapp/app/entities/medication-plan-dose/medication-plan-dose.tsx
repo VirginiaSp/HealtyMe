@@ -73,8 +73,8 @@ export const MedicationPlanDose = () => {
           </Button>
           <Link
             to="/medication-plan-dose/new"
-            className="btn btn-primary jh-create-entity"
-            id="jh-create-entity"
+            className="btn btn-primary create-entity-btn"
+            id="create-entity-btn"
             data-cy="entityCreateButton"
           >
             <FontAwesomeIcon icon="plus" />
