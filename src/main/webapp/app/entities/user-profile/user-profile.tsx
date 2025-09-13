@@ -71,7 +71,12 @@ export const UserProfile = () => {
             <FontAwesomeIcon icon="sync" spin={loading} />{' '}
             <Translate contentKey="healthyMeApp.userProfile.home.refreshListLabel">Refresh List</Translate>
           </Button>
-          <Link to="/user-profile/new" className="btn btn-primary jh-create-entity" id="jh-create-entity" data-cy="entityCreateButton">
+          <Link
+            to="/user-profile/new"
+            className="btn btn-primary create-entity-button"
+            id="create-entity-button"
+            data-cy="entityCreateButton"
+          >
             <FontAwesomeIcon icon="plus" />
             &nbsp;
             <Translate contentKey="healthyMeApp.userProfile.home.createLabel">Create new User Profile</Translate>

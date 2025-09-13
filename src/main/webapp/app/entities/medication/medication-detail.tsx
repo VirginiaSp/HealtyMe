@@ -25,7 +25,7 @@ export const MedicationDetail = () => {
         <h2 data-cy="medicationDetailsHeading">
           <Translate contentKey="healthyMeApp.medication.detail.title">Medication</Translate>
         </h2>
-        <dl className="jh-entity-details">
+        <dl className="entity-details">
           <dt>
             <span id="id">
               <Translate contentKey="global.field.id">ID</Translate>

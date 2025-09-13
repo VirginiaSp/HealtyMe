@@ -27,6 +27,7 @@ interface ValidatedFieldProps {
   readOnly?: boolean;
   disabled?: boolean;
   multiple?: boolean;
+  rows?: number;
 }
 
 export const ValidatedField: React.FC<ValidatedFieldProps> = ({

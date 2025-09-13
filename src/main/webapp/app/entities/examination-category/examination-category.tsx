@@ -73,8 +73,8 @@ export const ExaminationCategory = () => {
           </Button>
           <Link
             to="/examination-category/new"
-            className="btn btn-primary jh-create-entity"
-            id="jh-create-entity"
+            className="btn btn-primary create-entity-button"
+            id="create-entity-button"
             data-cy="entityCreateButton"
           >
             <FontAwesomeIcon icon="plus" />

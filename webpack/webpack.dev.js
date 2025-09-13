@@ -85,7 +85,7 @@ module.exports = async options =>
             },
           },
           /*
-      ,ghostMode: { // uncomment this part to disable BrowserSync ghostMode; https://github.com/jhipster/generator-jhipster/issues/11116
+      ,ghostMode: { // uncomment this part to disable BrowserSync ghostMode; https://github.com/browsersync/browser-sync/issues
         clicks: false,
         location: false,
         forms: false,

@@ -37,7 +37,7 @@ export const getSortState = (location: any, sortField?: string): ISortBaseState 
   const [field, order] = sort.split(',');
   return {
     sort: field,
-    order: (order === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc',
+    order: order === 'desc' ? 'desc' : 'asc',
   };
 };
 
