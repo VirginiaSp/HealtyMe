@@ -8,7 +8,7 @@ import medicationPlan from 'app/entities/medication-plan/medication-plan.reducer
 import medicationPlanDose from 'app/entities/medication-plan-dose/medication-plan-dose.reducer';
 import examinationCategory from 'app/entities/examination-category/examination-category.reducer';
 import examinationRecord from 'app/entities/examination-record/examination-record.reducer';
-/* jhipster-needle-add-reducer-import - JHipster will add reducer here */
+/* Add reducer imports here */
 
 const entitiesReducers = {
   userProfile,
@@ -21,7 +21,7 @@ const entitiesReducers = {
   medicationPlanDose,
   examinationCategory,
   examinationRecord,
-  /* jhipster-needle-add-reducer-combine - JHipster will add reducer here */
+  /* Add new reducers here */
 };
 
 export default entitiesReducers;

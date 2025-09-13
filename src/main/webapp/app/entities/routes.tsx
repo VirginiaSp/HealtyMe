@@ -13,7 +13,7 @@ import MedicationPlan from './medication-plan';
 import MedicationPlanDose from './medication-plan-dose';
 import ExaminationCategory from './examination-category';
 import ExaminationRecord from './examination-record';
-/* jhipster-needle-add-route-import - JHipster will add routes here */
+/* Add route imports here */
 
 export default () => {
   return (
@@ -30,7 +30,7 @@ export default () => {
         <Route path="medication-plan-dose/*" element={<MedicationPlanDose />} />
         <Route path="examination-category/*" element={<ExaminationCategory />} />
         <Route path="examination-record/*" element={<ExaminationRecord />} />
-        {/* jhipster-needle-add-route-path - JHipster will add routes here */}
+        {/* Add new routes here */}
       </ErrorBoundaryRoutes>
     </div>
   );
