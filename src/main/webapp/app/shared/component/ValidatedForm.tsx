@@ -9,9 +9,10 @@ interface ValidatedFormProps {
   onSubmit: (data: Record<string, any>) => void;
   children: ReactNode;
   className?: string;
+  defaultValues?: any;
 }
 
-export const ValidatedForm: React.FC<ValidatedFormProps> = ({ id, onSubmit, children, className, ...props }) => {
+export const ValidatedForm: React.FC<ValidatedFormProps> = ({ id, onSubmit, children, className, defaultValues, ...props }) => {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Button, Col, Row } from 'reactstrap';
-import { Translate, ValidatedField, ValidatedForm, isEmail, translate } from 'react-jhipster';
+import { Translate, ValidatedField, ValidatedForm, isEmail, translate } from 'app/shared/component';
 import { toast } from 'react-toastify';
 
 import { languages, locales } from 'app/config/translation';

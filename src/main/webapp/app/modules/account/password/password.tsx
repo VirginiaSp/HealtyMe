@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Translate, ValidatedField, ValidatedForm, translate } from 'react-jhipster';
+import { Translate, ValidatedField, ValidatedForm, translate } from 'app/shared/component';
 import { Button, Col, Row } from 'reactstrap';
 import { toast } from 'react-toastify';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Translate, ValidatedField, translate } from 'react-jhipster';
+import { Translate, ValidatedField, translate } from 'app/shared/component';
 import { Alert, Button, Col, Form, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { type FieldError, useForm } from 'react-hook-form';
@@ -75,7 +75,7 @@ const LoginModal = (props: ILoginModalProps) => {
                 type="checkbox"
                 check
                 label={translate('login.form.rememberme')}
-                value={true}
+                value="true"
                 register={register}
               />
             </Col>

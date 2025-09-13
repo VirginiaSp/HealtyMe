@@ -17,6 +17,13 @@ interface ValidatedFieldProps {
   className?: string;
   value?: string;
   defaultValue?: string;
+  required?: boolean;
+  autoFocus?: boolean;
+  children?: React.ReactNode;
+  check?: boolean;
+  register?: any;
+  error?: any;
+  isTouched?: any;
 }
 
 export const ValidatedField: React.FC<ValidatedFieldProps> = ({
@@ -31,10 +38,17 @@ export const ValidatedField: React.FC<ValidatedFieldProps> = ({
   className,
   value,
   defaultValue,
+  required,
+  autoFocus,
+  children,
+  check,
+  register,
+  error,
+  isTouched,
   ...props
 }) => {
   const [fieldValue, setFieldValue] = useState(value || defaultValue || '');
-  const [error, setError] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<string | null>(null);
   const [touched, setTouched] = useState(false);
 
   useEffect(() => {
@@ -49,7 +63,7 @@ export const ValidatedField: React.FC<ValidatedFieldProps> = ({
 
     if (validate && touched) {
       const validationError = validateField(newValue, validate);
-      setError(validationError);
+      setFieldError(validationError);
     }
 
     if (onChange) {
@@ -61,15 +75,42 @@ export const ValidatedField: React.FC<ValidatedFieldProps> = ({
     setTouched(true);
     if (validate) {
       const validationError = validateField(fieldValue, validate);
-      setError(validationError);
+      setFieldError(validationError);
     }
   };
 
-  const isInvalid = touched && !!error;
+  const isInvalid = touched && !!fieldError;
+
+  // Handle select fields
+  if (type === 'select') {
+    return (
+      <FormGroup className={className}>
+        {label && <Label for={id || name}>{label}</Label>}
+        <Input
+          id={id || name}
+          name={name}
+          type="select"
+          value={fieldValue}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          invalid={isInvalid}
+          data-cy={dataCy}
+          {...props}
+        >
+          {children}
+        </Input>
+        {isInvalid && <FormFeedback>{fieldError}</FormFeedback>}
+      </FormGroup>
+    );
+  }
 
   return (
-    <FormGroup className={className}>
-      {label && <Label for={id || name}>{label}</Label>}
+    <FormGroup className={className} check={check}>
+      {label && (
+        <Label for={id || name} check={check}>
+          {label}
+        </Label>
+      )}
       <Input
         id={id || name}
         name={name}
@@ -80,9 +121,11 @@ export const ValidatedField: React.FC<ValidatedFieldProps> = ({
         onBlur={handleBlur}
         invalid={isInvalid}
         data-cy={dataCy}
+        required={required}
+        autoFocus={autoFocus}
         {...props}
       />
-      {isInvalid && <FormFeedback>{error}</FormFeedback>}
+      {isInvalid && <FormFeedback>{fieldError}</FormFeedback>}
     </FormGroup>
   );
 };

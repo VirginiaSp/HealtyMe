@@ -13,7 +13,13 @@ export { Translate } from './Translate';
 export { TextFormat } from './TextFormat';
 
 // Pagination components
-export { CustomPagination as Pagination, ItemCount, getPaginationState } from './Pagination';
+export {
+  CustomPagination as Pagination,
+  CustomPagination as JhiPagination,
+  ItemCount,
+  ItemCount as JhiItemCount,
+  getPaginationState,
+} from './Pagination';
 
 // Utilities
 export { translate, Storage } from '../util/translation-utils';

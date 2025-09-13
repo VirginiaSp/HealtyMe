@@ -9,28 +9,36 @@ interface TextFormatProps {
   type?: 'date' | 'datetime' | 'number' | 'currency';
   format?: string;
   currency?: string;
+  blankOnInvalid?: boolean;
 }
 
-export const TextFormat: React.FC<TextFormatProps> = ({ value, type = 'date', format, currency = 'USD' }) => {
+export const TextFormat: React.FC<TextFormatProps> = ({ value, type = 'date', format, currency = 'USD', blankOnInvalid }) => {
   if (value == null) return null;
 
   let formattedValue: string;
 
-  switch (type) {
-    case 'date':
-      formattedValue = formatDate(value, format);
-      break;
-    case 'datetime':
-      formattedValue = formatDateTime(value);
-      break;
-    case 'number':
-      formattedValue = formatNumber(value);
-      break;
-    case 'currency':
-      formattedValue = formatCurrency(value, currency);
-      break;
-    default:
-      formattedValue = String(value);
+  try {
+    switch (type) {
+      case 'date':
+        formattedValue = formatDate(value, format);
+        break;
+      case 'datetime':
+        formattedValue = formatDateTime(value);
+        break;
+      case 'number':
+        formattedValue = formatNumber(value);
+        break;
+      case 'currency':
+        formattedValue = formatCurrency(value, currency);
+        break;
+      default:
+        formattedValue = String(value);
+    }
+  } catch (error) {
+    if (blankOnInvalid) {
+      return null;
+    }
+    formattedValue = String(value);
   }
 
   return <span>{formattedValue}</span>;

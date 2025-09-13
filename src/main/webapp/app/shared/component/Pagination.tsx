@@ -27,13 +27,16 @@ export const getPaginationState = (location: any, itemsPerPage: number, sortFiel
 
 interface ItemCountProps {
   page: number;
-  size: number;
+  size?: number;
   total: number;
+  itemsPerPage?: number;
+  i18nEnabled?: boolean;
 }
 
-export const ItemCount: React.FC<ItemCountProps> = ({ page, size, total }) => {
-  const first = Math.max(0, (page - 1) * size) + 1;
-  const last = Math.min(page * size, total);
+export const ItemCount: React.FC<ItemCountProps> = ({ page, size, total, itemsPerPage, i18nEnabled }) => {
+  const actualSize = size || itemsPerPage || 20;
+  const first = Math.max(0, (page - 1) * actualSize) + 1;
+  const last = Math.min(page * actualSize, total);
 
   return (
     <div>
