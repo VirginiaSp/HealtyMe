@@ -1,13 +1,15 @@
-import { Storage, TranslatorContext } from 'react-jhipster';
-
+import { Storage, setTranslationData } from 'app/shared/util/translation-utils';
 import { setLocale } from 'app/shared/reducers/locale';
 
-TranslatorContext.setDefaultLocale('en');
-TranslatorContext.setRenderInnerTextForMissingKeys(false);
+// Load translation data
+import globalTranslations from '../../i18n/en/global.json';
+
+// Set default translation data
+setTranslationData(globalTranslations);
 
 export const languages: any = {
   en: { name: 'English' },
-  // jhipster-needle-i18n-language-key-pipe - JHipster will add/remove languages in this object
+  // Custom language support can be added here
 };
 
 export const locales = Object.keys(languages).sort();

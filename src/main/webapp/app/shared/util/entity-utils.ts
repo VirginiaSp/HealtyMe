@@ -1,5 +1,17 @@
 import pick from 'lodash/pick';
-import { IPaginationBaseState, ISortBaseState } from 'react-jhipster';
+
+/**
+ * Interfaces to replace react-jhipster pagination and sort interfaces
+ */
+export interface ISortBaseState {
+  sort: string;
+  order: 'asc' | 'desc';
+}
+
+export interface IPaginationBaseState extends ISortBaseState {
+  activePage: number;
+  itemsPerPage: number;
+}
 
 /**
  * Removes fields with an 'id' field that equals ''.

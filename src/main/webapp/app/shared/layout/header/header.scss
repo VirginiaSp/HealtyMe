@@ -37,7 +37,7 @@ Development Ribbon
 /* ==========================================================================
 Navbar styles
 ========================================================================== */
-.jh-navbar {
+.app-navbar {
   background-color: #353d47;
   padding: 0.2em 1em;
   .profile-image {
@@ -66,7 +66,7 @@ Navbar styles
       margin-left: 5px;
     }
   }
-  .jh-navbar-toggler {
+  .navbar-toggler {
     color: #ccc;
     font-size: 1.5em;
     padding: 10px;
@@ -79,7 +79,7 @@ Navbar styles
   overflow: hidden;
 }
 
-.jh-navbar .navbar-nav .nav-link {
+.app-navbar .navbar-nav .nav-link {
   padding-right: 0;
   padding-left: 0;
 }

@@ -1,7 +1,8 @@
 import './header.scss';
 
 import React, { useState } from 'react';
-import { Storage, Translate } from 'react-jhipster';
+import { Storage } from 'app/shared/util/translation-utils';
+import { Translate } from 'app/shared/components/Translate';
 import { Collapse, Nav, Navbar, NavbarToggler } from 'reactstrap';
 import LoadingBar from 'react-redux-loading-bar';
 
@@ -47,7 +48,7 @@ const Header = (props: IHeaderProps) => {
     <div id="app-header">
       {renderDevRibbon()}
       <LoadingBar className="loading-bar" />
-      <Navbar data-cy="navbar" dark expand="md" fixed="top" className="jh-navbar">
+      <Navbar data-cy="navbar" dark expand="md" fixed="top" className="app-navbar">
         <NavbarToggler aria-label="Menu" onClick={toggleMenu} />
         <Brand />
         <Collapse isOpen={menuOpen} navbar>
