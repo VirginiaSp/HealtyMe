@@ -4,7 +4,7 @@ services:
   postgresql:
     image: postgres:17.4
     # volumes:
-    #   - ~/volumes/jhipster/HealthyMe/postgresql/:/var/lib/postgresql/data/
+    #   - ~/volumes/healthyme/HealthyMe/postgresql/:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=HealthyMe
       - POSTGRES_HOST_AUTH_METHOD=trust

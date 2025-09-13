@@ -37,7 +37,7 @@ management:
           - health
           - info
           - jhimetrics
-          - jhiopenapigroups
+          - openapi-groups
           - logfile
           - loggers
           - prometheus

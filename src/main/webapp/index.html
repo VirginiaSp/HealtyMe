@@ -11,7 +11,7 @@
     <link rel="icon" href="favicon.ico" />
     <link rel="manifest" href="manifest.webapp" />
     <link rel="stylesheet" href="content/css/loading.css" />
-    <!-- jhipster-needle-add-resources-to-root - JHipster will add new resources here -->
+    <!-- Add additional resources here -->
   </head>
   <body>
     <!--[if lt IE 9]>
@@ -36,7 +36,7 @@
         </div>
       </div>
       <div class="app-loading">
-        <div id="jhipster-error" style="display: none">
+        <div id="app-error" style="display: none">
           <!-- This content is for troubleshooting purpose and will be removed when app renders -->
           <h1>An error has occurred :-(</h1>
           <h2>Usual error causes</h2>
@@ -47,12 +47,12 @@
             </li>
             <li>
               You had a network error while running <code style="color: red">npm install</code>. If you are behind a corporate proxy, it is
-              likely that this error was caused by your proxy. Have a look at the JHipster error logs, you will probably have the cause of
-              the error.
+              likely that this error was caused by your proxy. Have a look at the application error logs, you will probably have the cause
+              of the error.
             </li>
             <li>
-              You installed a Node.js version that doesn't work with JHipster: please use an LTS (long-term support) version, as it's the
-              only version we support.
+              You installed a Node.js version that doesn't work with this application: please use an LTS (long-term support) version, as
+              it's the only version we support.
             </li>
           </ol>
           <h2>Building the client side code again</h2>
@@ -69,32 +69,27 @@
 
           <h2>Getting more help</h2>
 
-          <h3>If you have a question on how to use JHipster</h3>
+          <h3>If you have a question on how to use HealthyMe</h3>
           <p>
             Go to Stack Overflow with the
-            <a href="http://stackoverflow.com/tags/jhipster" target="_blank" rel="noopener noreferrer">"jhipster"</a> tag.
+            <a href="http://stackoverflow.com/tags/healthy-me" target="_blank" rel="noopener noreferrer">"healthy-me"</a> tag.
           </p>
 
           <h3>If you have a bug or a feature request</h3>
           <p>
             First read our
-            <a href="https://github.com/jhipster/generator-jhipster/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer"
+            <a href="https://github.com/healthyme/app/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer"
               >contributing guidelines</a
             >.
           </p>
           <p>
             Then, fill a ticket on our
-            <a href="https://github.com/jhipster/generator-jhipster/issues/new/choose" target="_blank" rel="noopener noreferrer"
-              >bug tracker</a
-            >, we'll be happy to resolve your issue!
+            <a href="https://github.com/healthyme/app/issues/new/choose" target="_blank" rel="noopener noreferrer">bug tracker</a>, we'll be
+            happy to resolve your issue!
           </p>
 
           <h3>If you want to chat with contributors and other users</h3>
-          <p>
-            Join our chat room on
-            <a href="https://gitter.im/jhipster/generator-jhipster" target="_blank" rel="noopener noreferrer">Gitter.im</a>. Please note
-            that this is a public chat room, and that we expect you to respect other people and write in a correct English language!
-          </p>
+          <p>Join our support community. Please note that we expect you to respect other people and write in a correct English language!</p>
           <!-- end of troubleshooting content -->
         </div>
       </div>
@@ -108,7 +103,7 @@
         setTimeout(showError, 4000);
       };
       function showError() {
-        const errorElm = document.getElementById('jhipster-error');
+        const errorElm = document.getElementById('app-error');
         if (errorElm?.style) {
           errorElm.style.display = 'block';
         }

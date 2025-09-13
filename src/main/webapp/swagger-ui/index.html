@@ -26,7 +26,7 @@
       };
 
       const getBearerToken = () => {
-        var authToken = localStorage.getItem('jhi-authenticationToken') || sessionStorage.getItem('jhi-authenticationToken');
+        var authToken = localStorage.getItem('authenticationToken') || sessionStorage.getItem('authenticationToken');
         if (authToken) {
           authToken = JSON.parse(authToken);
           return `Bearer ${authToken}`;
@@ -47,7 +47,7 @@
 
         if (!urls || urls.length === 0) {
           try {
-            const response = await axios.get('/management/jhiopenapigroups', axiosConfig);
+            const response = await axios.get('/management/openapi-groups', axiosConfig);
             if (Array.isArray(response.data)) {
               urls = response.data.map(({ group, description }) => ({ name: description, url: `${serverBaseUri}${baseUrl}/${group}` }));
             }
