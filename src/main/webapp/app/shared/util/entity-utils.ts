@@ -1,5 +1,5 @@
 import pick from 'lodash/pick';
-import { IPaginationBaseState, ISortBaseState } from 'react-jhipster';
+import { IPaginationBaseState, ISortBaseState } from 'app/shared/component';
 
 /**
  * Removes fields with an 'id' field that equals ''.
@@ -28,7 +28,7 @@ export const overrideSortStateWithQueryParams = (paginationBaseState: ISortBaseS
   if (sort) {
     const sortSplit = sort.split(',');
     paginationBaseState.sort = sortSplit[0];
-    paginationBaseState.order = sortSplit[1];
+    paginationBaseState.order = (sortSplit[1] as 'asc' | 'desc') || 'asc';
   }
   return paginationBaseState;
 };

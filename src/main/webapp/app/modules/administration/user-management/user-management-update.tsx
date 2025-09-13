@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Col, FormText, Row } from 'reactstrap';
-import { Translate, ValidatedField, ValidatedForm, isEmail, translate } from 'react-jhipster';
+import { Translate, ValidatedField, ValidatedForm, isEmail, translate } from 'app/shared/component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import { languages, locales } from 'app/config/translation';
@@ -143,7 +143,7 @@ export const UserManagementUpdate = () => {
                 type="checkbox"
                 name="activated"
                 check
-                value={true}
+                value="true"
                 disabled={!user.id}
                 label={translate('userManagement.activated')}
               />

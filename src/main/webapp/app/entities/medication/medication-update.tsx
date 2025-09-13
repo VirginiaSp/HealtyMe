@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col, FormText, Card, CardBody, CardHeader, Badge } from 'reactstrap';
-import { ValidatedField, ValidatedForm } from 'react-jhipster';
+import { ValidatedField, ValidatedForm } from 'app/shared/component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faPlus, faTimes, faPills, faCheck, faArrowLeft, faSave, faTags } from '@fortawesome/free-solid-svg-icons';
 

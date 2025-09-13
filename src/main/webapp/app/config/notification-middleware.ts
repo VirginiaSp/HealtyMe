@@ -1,4 +1,4 @@
-import { translate } from 'react-jhipster';
+import { translate } from 'app/shared/component';
 import { toast } from 'react-toastify';
 import { isFulfilledAction, isRejectedAction } from 'app/shared/reducers/reducer.utils';
 import { isAxiosError } from 'axios';

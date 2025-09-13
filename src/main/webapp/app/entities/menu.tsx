@@ -1,5 +1,5 @@
 import React from 'react';
-import { Translate } from 'react-jhipster';
+import { Translate } from 'app/shared/component';
 
 import MenuItem from 'app/shared/layout/menus/menu-item';
 

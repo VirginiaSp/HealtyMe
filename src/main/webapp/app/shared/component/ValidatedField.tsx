@@ -24,6 +24,9 @@ interface ValidatedFieldProps {
   register?: any;
   error?: any;
   isTouched?: any;
+  readOnly?: boolean;
+  disabled?: boolean;
+  multiple?: boolean;
 }
 
 export const ValidatedField: React.FC<ValidatedFieldProps> = ({
@@ -43,8 +46,10 @@ export const ValidatedField: React.FC<ValidatedFieldProps> = ({
   children,
   check,
   register,
-  error,
-  isTouched,
+  readOnly,
+  disabled,
+  multiple,
+  rows,
   ...props
 }) => {
   const [fieldValue, setFieldValue] = useState(value || defaultValue || '');
@@ -81,6 +86,29 @@ export const ValidatedField: React.FC<ValidatedFieldProps> = ({
 
   const isInvalid = touched && !!fieldError;
 
+  // Handle textarea fields
+  if (type === 'textarea') {
+    return (
+      <FormGroup className={className}>
+        {label && <Label for={id || name}>{label}</Label>}
+        <Input
+          id={id || name}
+          name={name}
+          type="textarea"
+          placeholder={placeholder}
+          value={fieldValue}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          invalid={isInvalid}
+          data-cy={dataCy}
+          rows={rows}
+          {...props}
+        />
+        {isInvalid && <FormFeedback>{fieldError}</FormFeedback>}
+      </FormGroup>
+    );
+  }
+
   // Handle select fields
   if (type === 'select') {
     return (
@@ -95,6 +123,7 @@ export const ValidatedField: React.FC<ValidatedFieldProps> = ({
           onBlur={handleBlur}
           invalid={isInvalid}
           data-cy={dataCy}
+          multiple={multiple}
           {...props}
         >
           {children}
@@ -123,6 +152,8 @@ export const ValidatedField: React.FC<ValidatedFieldProps> = ({
         data-cy={dataCy}
         required={required}
         autoFocus={autoFocus}
+        readOnly={readOnly}
+        disabled={disabled}
         {...props}
       />
       {isInvalid && <FormFeedback>{fieldError}</FormFeedback>}

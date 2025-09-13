@@ -49,7 +49,7 @@ export const UserManagement = () => {
         ...pagination,
         activePage: +page,
         sort: sortSplit[0],
-        order: sortSplit[1],
+        order: (sortSplit[1] as 'asc' | 'desc') || 'asc',
       });
     }
   }, [pageLocation.search]);

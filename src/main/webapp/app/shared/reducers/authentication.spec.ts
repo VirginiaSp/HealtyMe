@@ -1,6 +1,6 @@
 import axios from 'axios';
 import sinon from 'sinon';
-import { Storage } from 'react-jhipster';
+import { Storage } from 'app/shared/component';
 import { configureStore, createReducer } from '@reduxjs/toolkit';
 
 import authentication, {

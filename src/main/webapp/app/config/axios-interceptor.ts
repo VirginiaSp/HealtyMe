@@ -1,5 +1,5 @@
 import axios, { type AxiosError } from 'axios';
-import { Storage } from 'react-jhipster';
+import { Storage } from 'app/shared/component';
 
 const TIMEOUT = 1 * 60 * 1000;
 axios.defaults.timeout = TIMEOUT;

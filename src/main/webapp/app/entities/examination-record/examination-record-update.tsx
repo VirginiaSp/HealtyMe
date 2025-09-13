@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, FormGroup, Label, Input } from 'reactstrap';
-import { ValidatedField, ValidatedForm, ValidatedBlobField, translate } from 'react-jhipster';
+import { ValidatedField, ValidatedForm, ValidatedBlobField, translate } from 'app/shared/component';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 
 import {

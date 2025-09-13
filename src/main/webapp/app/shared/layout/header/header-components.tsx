@@ -1,5 +1,5 @@
 import React from 'react';
-import { Translate } from 'react-jhipster';
+import { Translate } from 'app/shared/component';
 
 import { NavItem, NavLink, NavbarBrand } from 'reactstrap';
 import { NavLink as Link } from 'react-router-dom';

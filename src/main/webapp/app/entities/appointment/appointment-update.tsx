@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button, Row, Col } from 'reactstrap';
-import { Translate, translate, ValidatedField, ValidatedForm } from 'react-jhipster';
+import { Translate, translate, ValidatedField, ValidatedForm } from 'app/shared/component';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { createEntity, getEntity, reset as resetAppointment, updateEntity } from './appointment.reducer';
 import { getEntities as getDoctors } from 'app/entities/doctor/doctor.reducer';

@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { Storage } from 'react-jhipster';
+import { Storage } from 'app/shared/component';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { AppThunk } from 'app/config/store';
@@ -30,7 +30,7 @@ export const getSession = (): AppThunk => async (dispatch, getState) => {
 
   const { account } = getState().authentication;
   if (account && account.langKey) {
-    const langKey = Storage.session.get('locale', account.langKey);
+    const langKey = Storage.session.get('locale') || account.langKey;
     await dispatch(setLocale(langKey));
   }
 };

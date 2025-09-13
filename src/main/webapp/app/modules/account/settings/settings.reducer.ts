@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Storage } from 'react-jhipster';
+import { Storage } from 'app/shared/component';
 import { getSession } from 'app/shared/reducers/authentication';
 import { AppThunk } from 'app/config/store';
 import { serializeAxiosError } from 'app/shared/reducers/reducer.utils';

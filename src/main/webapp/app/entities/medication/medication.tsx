@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card, CardBody, CardHeader, Collapse, Badge, Modal, ModalHeader, ModalBody, ModalFooter, Row, Col } from 'reactstrap';
-import { Translate } from 'react-jhipster';
+import { Translate } from 'app/shared/component';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faStar,
@@ -185,7 +185,7 @@ export const Medication = () => {
     itemsPerPage: ITEMS_PER_PAGE,
   });
 
-  const [sortState, setSortState] = useState(overrideSortStateWithQueryParams({ sort: 'id', order: 'ASC' }, pageLocation.search));
+  const [sortState, setSortState] = useState(overrideSortStateWithQueryParams({ sort: 'id', order: 'asc' }, pageLocation.search));
 
   const [currentView, setCurrentView] = useState<ViewType>(() => {
     const savedView = localStorage.getItem('medicationViewPreference') as ViewType;

@@ -1,4 +1,17 @@
-import { Storage, TranslatorContext } from 'react-jhipster';
+import { Storage } from 'app/shared/component';
+
+// Simple TranslatorContext replacement
+export const TranslatorContext = {
+  registerTranslations(locale: string, translations: any) {},
+  setDefaultLocale(locale: string) {},
+  setLocale(locale: string) {},
+  setRenderInnerTextForMissingKeys(value: boolean) {},
+  context: {
+    locale: 'en',
+    translations: {},
+    lastChange: Date.now(),
+  },
+};
 
 import { setLocale } from 'app/shared/reducers/locale';
 

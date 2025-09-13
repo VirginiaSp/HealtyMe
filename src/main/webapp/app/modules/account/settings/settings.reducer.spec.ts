@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import axios from 'axios';
 import sinon from 'sinon';
-import { TranslatorContext } from 'react-jhipster';
+import { TranslatorContext } from 'app/shared/component';
 
 import account, { reset, updateAccount } from './settings.reducer';
 

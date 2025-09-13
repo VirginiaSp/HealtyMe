@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Translate } from 'react-jhipster';
+import { Translate } from 'app/shared/component';
 import { Badge, Button, Col, Row, Table } from 'reactstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 

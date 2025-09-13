@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Col, Row, ButtonGroup } from 'reactstrap';
-import { Translate } from 'react-jhipster';
+import { Translate } from 'app/shared/component';
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { getEntities } from './examination-record.reducer';
 import { IExaminationRecord } from 'app/shared/model/examination-record.model';

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Translate } from 'react-jhipster';
+import { Translate } from 'app/shared/component';
 
 import { useAppDispatch, useAppSelector } from 'app/config/store';
 import { changeLogLevel, getLoggers } from '../administration.reducer';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { render } from '@testing-library/react';
-import { TranslatorContext } from 'react-jhipster';
+import { TranslatorContext } from 'app/shared/component';
 import configureStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 

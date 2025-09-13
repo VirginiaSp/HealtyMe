@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, PathRouteProps, useLocation } from 'react-router-dom';
-import { Translate } from 'react-jhipster';
+import { Translate } from 'app/shared/component';
 
 import { useAppSelector } from 'app/config/store';
 import ErrorBoundary from 'app/shared/error/error-boundary';

@@ -1,7 +1,7 @@
 import React from 'react';
 import MenuItem from 'app/shared/layout/menus/menu-item';
 
-import { Translate, translate } from 'react-jhipster';
+import { Translate, translate } from 'app/shared/component';
 import { NavDropdown } from './menu-components';
 
 const adminMenuItems = () => (
